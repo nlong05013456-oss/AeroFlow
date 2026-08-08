@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files (Dữ liệu thô & file nén lớn)
+Data/
+*.csv
+*.dat
+*.json.gz
+
+# Environment variables & GCP keys
+.env
+*.json
+!boot_data.json
+
+# Scratch & IDE
+scratch/
+.gemini/
+.idea/
+.vscode/
+*.swp
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db

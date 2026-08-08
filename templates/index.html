@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroFlow Platform | Cổng Tra Cứu Chuyến Bay & Dashboard Quản Trị Phân Tích 2026</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet.js Interactive Map CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #060814;
+            --panel-bg: rgba(13, 16, 38, 0.75);
+            --panel-hover: rgba(22, 27, 60, 0.95);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 242, 254, 0.3);
+            
+            --primary-grad: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --purple-grad: linear-gradient(135deg, #b15cff 0%, #6f00ff 100%);
+            --emerald-grad: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+            --amber-grad: linear-gradient(135deg, #ffb703 0%, #fb8500 100%);
+            
+            --cyan-glow: #00f2fe;
+            --emerald-glow: #00e676;
+            --purple-glow: #9d4edd;
+            --success-color: #00e676;
+            --warning-color: #ffd600;
+            --danger-color: #ff1744;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 15%, rgba(111, 0, 255, 0.2) 0px, transparent 45%),
+                radial-gradient(circle at 90% 20%, rgba(0, 242, 254, 0.18) 0px, transparent 40%),
+                radial-gradient(circle at 50% 85%, rgba(0, 230, 118, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- Header Topbar --- */
+        header {
+            height: 70px;
+            padding: 0 35px;
+            background: rgba(6, 8, 20, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-grad);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #060814;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        /* --- Portal Switcher Nav --- */
+        .portal-nav {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .portal-tab {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .portal-tab.active {
+            background: var(--primary-grad);
+            color: #060814;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .portal-tab:hover:not(.active) {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .role-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .role-admin {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--cyan-glow);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+        }
+
+        .role-customer {
+            background: rgba(0, 230, 118, 0.12);
+            color: var(--success-color);
+            border: 1px solid rgba(0, 230, 118, 0.35);
+            box-shadow: 0 0 12px rgba(0, 230, 118, 0.15);
+        }
+
+        /* --- Main Container --- */
+        .container {
+            max-width: 1650px;
+            margin: 20px auto;
+            padding: 0 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .portal-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- Search Widget --- */
+        .search-widget {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) 150px;
+            gap: 15px;
+            align-items: end;
+            margin-top: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(6, 8, 20, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Custom Date Picker & Select List Styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.9) sepia(1) saturate(5) hue-rotate(170deg);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px;
+        }
+
+        .form-control option {
+            background-color: #0d1026;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .btn-search {
+            background: var(--primary-grad);
+            color: #060814;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        /* Results Display */
+        .customer-results-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .panel-card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--cyan-glow);
+        }
+
+        /* Flight Result Overview Card */
+        .flight-item-card {
+            background: rgba(6, 8, 20, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flight-item-card:hover {
+            border-color: var(--cyan-glow);
+            background: rgba(0, 242, 254, 0.05);
+            transform: translateX(4px);
+        }
+
+        .flight-main-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .airline-badge {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--cyan-glow);
+        }
+
+        .flight-route {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .route-cities {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .route-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .click-hint {
+            font-size: 11px;
+            color: var(--cyan-glow);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .risk-score-badge {
+            width: 125px;
+            min-width: 125px;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-val {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .risk-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Detailed Flight Inspector & Security Lock Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 5, 13, 0.88);
+            backdrop-filter: blur(16px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+
+        .inspector-modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 950px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        .inspector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .dual-weather-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .weather-box-item {
+            background: rgba(6, 8, 20, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #inspector-map {
+            height: 280px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-glow);
+            z-index: 1;
+        }
+
+        /* --- Admin Executive Controls & Filter Bar --- */
+        .btn-action {
+            padding: 9px 16px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-daily {
+            background: var(--emerald-grad);
+            color: #060814;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+        }
+
+        .btn-daily:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5);
+        }
+
+        /* Hero KPI Grid — fixed 3-column layout */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.35s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: var(--primary-grad);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 242, 254, 0.12);
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-info p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-info h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-top: 4px;
+        }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        /* Analytics Grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-box {
+            height: 250px;
+            position: relative;
+            width: 100%;
+        }
+
+        /* Hotspot Airport & Delayed Aircraft List Cards */
+        .hotspot-card-item {
+            background: rgba(6, 8, 20, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .hotspot-card-item:hover {
+            border-color: var(--cyan-glow);
+            transform: translateX(3px);
+        }
+
+        .hotspot-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--primary-grad);
+        }
+
+        /* Console Terminal */
+        .terminal-card {
+            background: #03050d;
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .terminal-header {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .terminal-body {
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #a5f3fc;
+            height: 160px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .terminal-log-success { color: #00e676; font-weight: bold; }
+        .terminal-log-error { color: #ff1744; font-weight: bold; }
+        .terminal-log-info { color: #00f2fe; }
+
+        /* Quick Links Sheets */
+        .sheets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .sheet-btn {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sheet-btn:hover {
+            border-color: var(--cyan-glow);
+            background: rgba(0, 242, 254, 0.08);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Topbar -->
+    <header>
+        <div class="brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-plane-departure"></i>
+            </div>
+            <div class="brand-text">
+                <h1>AEROFLOW PLATFORM</h1>
+                <span>Cloud Data Platform & AI Analytics 2026</span>
+            </div>
+        </div>
+
+        <!-- Portal Navigation Tabs -->
+        <div class="portal-nav">
+            <div class="portal-tab active" id="tab-customer" onclick="switchPortal('customer')">
+                <i class="fa-solid fa-user-check"></i> Customer Portal
+            </div>
+            <div class="portal-tab" id="tab-admin" onclick="switchPortal('admin')">
+                <i class="fa-solid fa-chart-pie"></i> Admin Analytics Portal
+            </div>
+        </div>
+
+        <div class="header-actions" style="display: flex; align-items: center; gap: 14px;">
+            <!-- Real-Time Digital Clock Badge -->
+            <div id="live-clock-badge" style="background: rgba(0, 242, 254, 0.08); border: 1px solid var(--border-glow); padding: 6px 14px; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);">
+                <i class="fa-regular fa-clock" style="color: var(--cyan-glow); font-size: 14px;"></i>
+                <span id="live-clock-time" style="color: var(--cyan-glow); letter-spacing: 0.5px;">--:--:-- --</span>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600; padding-left: 4px; border-left: 1px solid rgba(255,255,255,0.1);" id="live-clock-date">--/--/----</span>
+            </div>
+
+            <div class="role-badge role-customer" id="role-badge">
+                <i class="fa-solid fa-user-check"></i> CUSTOMER PORTAL ACTIVE
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- ================= 1. CUSTOMER PORTAL SECTION ================= -->
+        <div id="customer-portal-section" class="portal-section">
+
+            <!-- Search Form Widget -->
+            <div class="search-widget">
+                <div class="card-title">
+                    <div class="card-title-text">
+                        <i class="fa-solid fa-magnifying-glass-location"></i> Tra Cứu Chuyến Bay Real-Time & Dự Báo Thời Tiết
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-regular fa-calendar"></i> 1. Ngày bay</label>
+                        <input type="date" id="search-date" class="form-control" onclick="try{this.showPicker()}catch(e){}" onchange="doCustomerSearch()">
+                        <script>
+                            const _d = new Date();
+                            const _yr = _d.getFullYear();
+                            const _mo = String(_d.getMonth() + 1).padStart(2, '0');
+                            const _dy = String(_d.getDate()).padStart(2, '0');
+                            document.getElementById('search-date').value = `${_yr}-${_mo}-${_dy}`;
+                        </script>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-plane-up"></i> 2. Sân bay đi (Origin)</label>
+                        <select id="search-origin" class="form-control" onchange="onOriginChange()">
+                            <option value="">-- Tất cả Sân bay --</option>
+                            <option value="ATL">ATL - Atlanta Intl</option>
+                            <option value="LAX">LAX - Los Angeles Intl</option>
+                            <option value="ORD">ORD - Chicago O'Hare</option>
+                            <option value="DFW">DFW - Dallas/Fort Worth</option>
+                            <option value="DEN">DEN - Denver Intl</option>
+                            <option value="JFK">JFK - New York JFK</option>
+                            <option value="EWR">EWR - Newark Liberty</option>
+                            <option value="CLT">CLT - Charlotte Douglas</option>
+                            <option value="SFO">SFO - San Francisco Intl</option>
+                            <option value="SEA">SEA - Seattle-Tacoma</option>
+                            <option value="LAS">LAS - Las Vegas Harry Reid</option>
+                            <option value="MCO">MCO - Orlando Intl</option>
+                            <option value="BOS">BOS - Boston Logan</option>
+                            <option value="MIA">MIA - Miami Intl</option>
+                            <option value="PHX">PHX - Phoenix Sky Harbor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-plane-arrival"></i> 3. Sân bay đến (Dest)</label>
+                        <select id="search-dest" class="form-control" onchange="onDestChange()">
+                            <option value="">-- Tất cả Sân bay --</option>
+                            <option value="ATL">ATL - Atlanta Intl</option>
+                            <option value="LAX">LAX - Los Angeles Intl</option>
+                            <option value="ORD">ORD - Chicago O'Hare</option>
+                            <option value="DFW">DFW - Dallas/Fort Worth</option>
+                            <option value="DEN">DEN - Denver Intl</option>
+                            <option value="JFK">JFK - New York JFK</option>
+                            <option value="EWR">EWR - Newark Liberty</option>
+                            <option value="CLT">CLT - Charlotte Douglas</option>
+                            <option value="SFO">SFO - San Francisco Intl</option>
+                            <option value="SEA">SEA - Seattle-Tacoma</option>
+                            <option value="LAS">LAS - Las Vegas Harry Reid</option>
+                            <option value="MCO">MCO - Orlando Intl</option>
+                            <option value="BOS">BOS - Boston Logan</option>
+                            <option value="MIA">MIA - Miami Intl</option>
+                            <option value="PHX">PHX - Phoenix Sky Harbor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-barcode"></i> 4. Hãng bay / Số đuôi</label>
+                        <select id="search-tail" class="form-control" onchange="doCustomerSearch()">
+                            <option value="">-- Tất cả Hãng bay --</option>
+                        </select>
+                    </div>
+                    <button class="btn-search" onclick="doCustomerSearch()">
+                        <i class="fa-solid fa-bolt"></i> Lọc Tức Thì
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Results Display Grid -->
+            <div class="customer-results-grid" style="align-items: stretch;">
+                
+                <!-- Left: Flight Overview Cards List -->
+                <div style="display: flex; flex-direction: column;">
+                    <div class="panel-card" style="display: flex; flex-direction: column;">
+                        <div class="card-title">
+                            <div class="card-title-text">
+                                <i class="fa-solid fa-plane-circle-check"></i> Kết Quả Chuyến Bay & Điểm Rủi Ro
+                            </div>
+                            <span id="search-count-badge" style="font-size:12px; font-weight:700; color:var(--cyan-glow); background:rgba(0,242,254,0.1); padding:4px 10px; border-radius:12px; border:1px solid var(--border-glow);">
+                                Đang quét BigQuery...
+                            </span>
+                        </div>
+                        <div id="flight-results-container" style="display: flex; flex-direction: column; gap: 10px; height: 1045px; max-height: 1045px; overflow-y: auto; padding-right: 6px;">
+                            <!-- Results dynamically injected -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Dual Weather Box, Best Day to Fly & Airline On-Time Rankings -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    
+                    <!-- Dual Weather Panel (Origin & Destination) -->
+                    <div class="panel-card">
+                        <div class="card-title">
+                            <div class="card-title-text">
+                                <i class="fa-solid fa-cloud-sun-rain"></i> Thời Tiết 2 Đầu
+                            </div>
+                            <span style="font-size: 11px; color: var(--emerald-glow); font-weight: 700;">🟢 LIVE METEO</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Origin Weather Card -->
+                            <div id="weather-box-info" style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.06) 0%, rgba(79, 172, 254, 0.08) 100%); border: 1px solid var(--border-glow); border-radius: 14px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+                                <div id="weather-origin-icon" style="font-size: 42px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(255,193,7,0.3));">☀️</div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 10px; color: var(--cyan-glow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-plane-departure" style="margin-right:4px;"></i>Sân bay Khởi hành</div>
+                                    <h4 id="weather-airport-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">EWR (Newark Liberty)</h4>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+                                        <span id="weather-condition-text">Trời quang</span>
+                                        <span><i class="fa-solid fa-droplet" style="color:#4fc3f7; margin-right:2px;"></i> <b id="weather-precip" style="color:#fff;">0.0 mm</b></span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; flex-shrink: 0;">
+                                    <div id="weather-temp-range" style="font-family: 'Outfit'; font-size: 28px; font-weight: 900; color: #fff; line-height: 1;">29.4 °C</div>
+                                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Thuận lợi bay</div>
+                                </div>
+                            </div>
+
+                            <!-- Destination Weather Card -->
+                            <div id="weather-dest-box-info" style="background: linear-gradient(135deg, rgba(0, 230, 118, 0.06) 0%, rgba(0, 242, 254, 0.06) 100%); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 14px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+                                <div id="weather-dest-icon" style="font-size: 42px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(100,181,246,0.3));">🌧️</div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 10px; color: var(--emerald-glow); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-plane-arrival" style="margin-right:4px;"></i>Sân bay Điểm Đến</div>
+                                    <h4 id="weather-dest-airport-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">CLT (Charlotte Douglas)</h4>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+                                        <span id="weather-dest-condition-text">Mưa rào nhẹ</span>
+                                        <span><i class="fa-solid fa-droplet" style="color:#4fc3f7; margin-right:2px;"></i> <b id="weather-dest-precip" style="color:#fff;">1.2 mm</b></span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; flex-shrink: 0;">
+                                    <div id="weather-dest-temp-range" style="font-family: 'Outfit'; font-size: 28px; font-weight: 900; color: #fff; line-height: 1;">22.1 °C</div>
+                                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Canh chừng mưa</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Day of Week to Fly Widget -->
+                    <div class="panel-card">
+                        <div class="card-title">
+                            <div class="card-title-text">
+                                <i class="fa-solid fa-calendar-check"></i> Ngày Nào Trong Tuần Ít Trễ Nhất?
+                            </div>
+                        </div>
+                        <div id="best-days-list" style="display: flex; flex-direction: column; gap: 6px;">
+                            <!-- Best Days injected -->
+                        </div>
+                    </div>
+
+                    <!-- Airline On-Time Rankings -->
+                    <div class="panel-card">
+                        <div class="card-title">
+                            <div class="card-title-text">
+                                <i class="fa-solid fa-trophy"></i> Xếp Hạng Đúng Giờ Hãng Bay (On-Time Rank)
+                            </div>
+                        </div>
+                        <div id="airline-rankings-list" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Rankings dynamically injected -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= 2. ADMIN ANALYTICS PORTAL SECTION ================= -->
+        <div id="admin-portal-section" class="portal-section" style="display: none;">
+            
+            <!-- Unified Single-Row Admin Filter & Action Bar -->
+            <div class="panel-card" style="padding: 12px 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 780px;">
+                        <span style="font-family:'Outfit'; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap;">
+                            <i class="fa-solid fa-filter" style="color: var(--cyan-glow);"></i> Bộ Lọc Admin:
+                        </span>
+                        
+                        <select id="filter-year" class="form-control" style="width: 125px; flex: 0 0 125px;" onchange="fetchStats()">
+                            <option value="all">🗓️ Năm (Tất cả)</option>
+                            <option value="2026" selected>2026</option>
+                        </select>
+
+                        <select id="filter-quarter" class="form-control" style="width: 145px; flex: 0 0 145px;" onchange="fetchStats()">
+                            <option value="all">📊 Quý (Tất cả)</option>
+                            <option value="1">Quý 1</option>
+                            <option value="2">Quý 2</option>
+                            <option value="3">Quý 3</option>
+                            <option value="4">Quý 4</option>
+                        </select>
+
+                        <select id="filter-month" class="form-control" style="width: 155px; flex: 0 0 155px;" onchange="fetchStats()">
+                            <option value="all">📅 Tất cả Tháng</option>
+                        </select>
+
+                        <select id="filter-airline" class="form-control" style="flex: 1; min-width: 175px;" onchange="fetchStats()">
+                            <option value="all">✈️ Tất cả Hãng Bay</option>
+                        </select>
+
+                        <select id="filter-airport" class="form-control" style="flex: 1; min-width: 175px;" onchange="fetchStats()">
+                            <option value="all">🌐 Tất cả Sân Bay</option>
+                            <option value="ATL">ATL - Atlanta Intl</option>
+                            <option value="LAX">LAX - Los Angeles Intl</option>
+                            <option value="ORD">ORD - Chicago O'Hare</option>
+                            <option value="DFW">DFW - Dallas/Fort Worth</option>
+                            <option value="DEN">DEN - Denver Intl</option>
+                            <option value="JFK">JFK - New York JFK</option>
+                            <option value="EWR">EWR - Newark Liberty</option>
+                            <option value="CLT">CLT - Charlotte Douglas</option>
+                            <option value="SFO">SFO - San Francisco Intl</option>
+                            <option value="SEA">SEA - Seattle-Tacoma</option>
+                            <option value="LAS">LAS - Las Vegas Harry Reid</option>
+                            <option value="MCO">MCO - Orlando Intl</option>
+                            <option value="BOS">BOS - Boston Logan</option>
+                            <option value="MIA">MIA - Miami Intl</option>
+                            <option value="PHX">PHX - Phoenix Sky Harbor</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-action btn-daily" onclick="triggerStep('daily')" style="white-space: nowrap;">
+                        <i class="fa-solid fa-bolt"></i> ⚡ Cào Nạp Daily
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Sheets Links Bar -->
+            <div class="panel-card" style="padding: 12px 20px;">
+                <div class="sheets-grid">
+                    <a href="https://console.cloud.google.com/bigquery?project=project-8ef27927-934d-40ca-998" target="_blank" class="sheet-btn">
+                        <i class="fa-solid fa-table-columns" style="color: #00f2fe;"></i> BigQuery Warehouse (13 Tables)
+                    </a>
+                    <a href="https://console.cloud.google.com/storage/browser/cap2aeroflow-data-lake-01062005nl" target="_blank" class="sheet-btn">
+                        <i class="fa-solid fa-bucket" style="color: #b15cff;"></i> GCS Data Lake Bucket
+                    </a>
+                    <a href="https://lookerstudio.google.com" target="_blank" class="sheet-btn">
+                        <i class="fa-solid fa-chart-column" style="color: #00e676;"></i> Looker Studio Executive Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero KPI Grid (3 columns × 2 rows) -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <p>✈️ Tổng Chuyến Bay</p>
+                        <h3 id="kpi-total-flights">2,881,296</h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(0,242,254,0.2), rgba(79,172,254,0.15)); color: #00f2fe;">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <p>🛬 Sân Bay Toàn Cầu</p>
+                        <h3><span id="kpi-airports" style="color: var(--cyan-glow);">9,231</span> <span style="font-size:14px; color:var(--text-secondary); font-weight:600;">sân bay</span></h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(0,176,255,0.2), rgba(0,242,254,0.12)); color: #00b0ff;">
+                        <i class="fa-solid fa-tower-observation"></i>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <p>🛤️ Tổng Đường Băng</p>
+                        <h3><span id="kpi-runways" style="color: #00e676;">15,482</span> <span style="font-size:14px; color:var(--text-secondary); font-weight:600;">đường băng</span></h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(0,230,118,0.2), rgba(0,176,255,0.12)); color: #00e676;">
+                        <i class="fa-solid fa-road"></i>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <p>🏢 Hãng Hàng Không</p>
+                        <h3 id="kpi-carriers" style="color: #b15cff;">14 <span style="font-size:14px; color:var(--text-secondary); font-weight:600;">hãng bay</span></h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(177,92,255,0.2), rgba(111,0,255,0.12)); color: #b15cff;">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-info">
+                        <p>⏱️ Đúng Giờ / Trễ TB</p>
+                        <h3 style="display:flex; align-items:baseline; gap:8px;"><span id="kpi-ontime-rate" style="color:#00e676;">81.4%</span><span id="kpi-avg-delay" style="font-size:16px; color:#ffb703;">14.60 min</span></h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(0,230,118,0.18), rgba(255,183,3,0.12)); color: #00e676;">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                </div>
+
+                <div class="kpi-card" onclick="openQualityModal()" style="cursor: pointer;" title="Bấm xem chi tiết 5 bài kiểm định">
+                    <div class="kpi-info">
+                        <p>🛡️ Kiểm Định Chất Lượng</p>
+                        <h3 style="color: #00e676;">PASS <span style="font-size:14px; color:var(--text-secondary); font-weight:600;">100%</span></h3>
+                    </div>
+                    <div class="kpi-icon" style="background: linear-gradient(135deg, rgba(0,230,118,0.2), rgba(177,92,255,0.12)); color: #00e676;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Charts Grid -->
+            <div class="analytics-grid">
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-ranking-star"></i> Top Hãng Bay Đúng Giờ Nổi Bật</div>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="chartCarrier"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-cloud-bolt"></i> Mức Độ Trễ Theo Điều Kiện Thời Tiết</div>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="chartWeather"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-chart-line"></i> Xu Hướng Trễ Theo Tháng & Daily Ingestion</div>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="chartMonthly"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-chart-pie"></i> Phân Tích Nguyên Nhân Trễ (Delay Breakdown)</div>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="chartCause"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Busiest Airports & Top Delayed Aircraft Fleet (Top 10 Each) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-building-user"></i> Sân Bay Bận Rộn & Tỷ Lệ Trễ Cao (Top 10)</div>
+                    </div>
+                    <div id="airport-hotspots-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow-y: auto; padding-right: 4px;">
+                        <!-- Hotspots injected -->
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="card-title">
+                        <div class="card-title-text"><i class="fa-solid fa-plane-triangle-exclamation"></i> Tàu Bay Thường Xuyên Trễ (Top 10 Delayed Fleet)</div>
+                    </div>
+                    <div id="delayed-aircraft-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow-y: auto; padding-right: 4px;">
+                        <!-- Aircraft list injected -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ETL Pipeline Health Timeline -->
+            <div class="panel-card" style="padding: 16px 20px;">
+                <div class="card-title">
+                    <div class="card-title-text"><i class="fa-solid fa-clock-rotate-left" style="color: var(--cyan-glow);"></i> LỊCH SỬ THỰC THI ETL PIPELINE (AUTOMATED DAILY LOGS)</div>
+                </div>
+                <div style="overflow-x: auto; max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #cbd5e1;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted);">
+                                <th style="padding: 8px 12px;">THỜI GIAN THỰC THI (SCHEDULE)</th>
+                                <th style="padding: 8px 12px;">TÁC VỤ (JOB)</th>
+                                <th style="padding: 8px 12px;">NGUỒN DỮ LIỆU</th>
+                                <th style="padding: 8px 12px;">SỐ CHUYẾN BAY</th>
+                                <th style="padding: 8px 12px;">XỬ LÝ</th>
+                                <th style="padding: 8px 12px;">TRẠNG THÁI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="etl-timeline-tbody">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">📅 2026-07-28 - 🤖 Tự Động Cron Job (00:55:57)</td>
+                                <td style="padding: 10px 12px; color: var(--cyan-glow); font-weight: 600;">Daily Ingestion & Weather Sync</td>
+                                <td style="padding: 10px 12px;">Live API & Open-Meteo</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan-glow);">20,570 chuyến bay</td>
+                                <td style="padding: 10px 12px;">3.4s</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">✅ SUCCESS</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">📅 2026-07-27 - ⚡ Nạp Thủ Công Admin (23:03:11)</td>
+                                <td style="padding: 10px 12px; color: var(--cyan-glow); font-weight: 600;">Daily Ingestion & Weather Sync</td>
+                                <td style="padding: 10px 12px;">Live API & Open-Meteo</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan-glow);">20,568 chuyến bay</td>
+                                <td style="padding: 10px 12px;">3.4s</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">✅ SUCCESS</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">📅 2026-07-26 - 🤖 Tự Động Cron Job (06:00:00)</td>
+                                <td style="padding: 10px 12px; color: var(--cyan-glow); font-weight: 600;">Daily Ingestion & Weather Sync</td>
+                                <td style="padding: 10px 12px;">Live API & Open-Meteo</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan-glow);">20,501 chuyến bay</td>
+                                <td style="padding: 10px 12px;">3.4s</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">✅ SUCCESS</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">📅 2026-07-25 - 🤖 Tự Động Cron Job (06:00:00)</td>
+                                <td style="padding: 10px 12px; color: var(--cyan-glow); font-weight: 600;">Daily Ingestion & Weather Sync</td>
+                                <td style="padding: 10px 12px;">Live API & Open-Meteo</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: var(--cyan-glow);">500 chuyến bay</td>
+                                <td style="padding: 10px 12px;">1.2s</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">✅ SUCCESS</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">📅 2026-01-01 ➔ 2026-05-31</td>
+                                <td style="padding: 10px 12px; color: #b15cff; font-weight: 600;">Historical Warehouse Batch Ingestion</td>
+                                <td style="padding: 10px 12px;">BTS US DOT Data Lake</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: #b15cff;">2,881,296 chuyến bay</td>
+                                <td style="padding: 10px 12px;">Archived</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">✅ LOADED</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Console Monitor Terminal -->
+            <div class="terminal-card">
+                <div class="terminal-header">
+                    <span><i class="fa-solid fa-terminal"></i> CONSOLE MONITOR LOGS (PIPELINE EXECUTION)</span>
+                    <span>Cloud Run Logs & BigQuery Execution</span>
+                </div>
+                <div class="terminal-body" id="terminal-console">
+[INFO] Admin Analytics Portal đã khởi tạo sẵn sàng. Sử dụng nút [⚡ Cào Nạp Daily] để điều phối nạp nối tiếp cộng dồn dữ liệu hàng ngày...
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Detailed Flight Inspector Modal -->
+    <div class="modal-overlay" id="flight-inspector-modal">
+        <div class="inspector-modal-content">
+            <div class="inspector-header">
+                <div>
+                    <h3 id="modal-flight-code" style="font-family:'Outfit'; font-size:22px; font-weight:800; color:#fff;">United Airlines UA2650</h3>
+                    <p id="modal-aircraft-info" style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Boeing B737-800 | Tail: N238UA | Ngày bay: 2026-05-15</p>
+                </div>
+                <button onclick="closeInspectorModal()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border-color); color:#fff; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:700;">
+                    <i class="fa-solid fa-xmark"></i> Đóng
+                </button>
+            </div>
+
+            <!-- Route Summary Header -->
+            <div style="background:rgba(6,8,20,0.6); border:1px solid var(--border-glow); padding:16px 20px; border-radius:14px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Hành Trình Bay</span>
+                    <div id="modal-route-title" style="font-family:'Outfit'; font-size:22px; font-weight:900; color:#fff; margin-top:2px;">EWR ➔ CLT</div>
+                </div>
+                <div style="text-align:center;">
+                    <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Khoảng Cách</span>
+                    <div id="modal-distance" style="font-family:'Outfit'; font-size:18px; font-weight:800; color:var(--cyan-glow); margin-top:2px;">529 miles</div>
+                </div>
+                <div style="text-align:center;">
+                    <span style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Thời Gian Bay Ước Tính</span>
+                    <div id="modal-duration" style="font-family:'Outfit'; font-size:18px; font-weight:800; color:#fff; margin-top:2px;">1h 48m</div>
+                </div>
+                <div id="modal-risk-badge-box">
+                    <!-- Injected -->
+                </div>
+            </div>
+
+            <!-- Dual Weather Panels -->
+            <div class="dual-weather-grid">
+                <div class="weather-box-item" style="position:relative; padding: 16px; background: rgba(6, 8, 20, 0.7); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size:11px; font-weight:700; color:var(--cyan-glow); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-plane-departure"></i> 1. THỜI TIẾT KHỞI HÀNH (ORIGIN)
+                        </div>
+                        <div id="modal-orig-status-badge" style="padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); display: flex; align-items: center; gap: 4px;">
+                            <i class="fa-solid fa-shield-halved"></i> AN TOÀN BAY
+                        </div>
+                    </div>
+                    
+                    <h4 id="modal-orig-airport" style="font-family:'Outfit'; font-size:16px; font-weight:800; color:#fff; margin-top:6px;">EWR - Newark Liberty</h4>
+                    
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-top:10px;">
+                        <div style="display:flex; align-items:center; gap:14px;">
+                            <span id="modal-orig-icon"></span>
+                            <div>
+                                <div id="modal-orig-temp" style="font-family:'Outfit'; font-size:28px; font-weight:900; color:#fff; line-height:1;">29.4 °C</div>
+                                <div id="modal-orig-cond" style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Trời quang / Thuận lợi</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                            <div style="font-size:11px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 9px; border-radius:8px; display:flex; align-items:center; gap:5px;">
+                                <i class="fa-solid fa-eye" style="color:var(--cyan-glow);"></i> Tầm nhìn: <b style="color:#fff;">10 km</b>
+                            </div>
+                            <div style="font-size:11px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 9px; border-radius:8px; display:flex; align-items:center; gap:5px;">
+                                <i class="fa-solid fa-gauge" style="color:var(--emerald-glow);"></i> Áp suất: <b style="color:#fff;">1013 hPa</b>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+                        <div style="display:flex; gap:16px;">
+                            <span><i class="fa-solid fa-wind" style="color:#4fc3f7; margin-right:4px;"></i>Gió: <b id="modal-orig-wind" style="color:#fff;">12.5 km/h</b></span>
+                            <span><i class="fa-solid fa-droplet" style="color:#4fc3f7; margin-right:4px;"></i>Mưa: <b id="modal-orig-precip" style="color:#fff;">0.0 mm</b></span>
+                        </div>
+                        <span style="color:var(--text-muted); font-size:10px;"><i class="fa-solid fa-satellite-dish" style="color:var(--cyan-glow); margin-right:3px;"></i> Open-Meteo Sensor</span>
+                    </div>
+                </div>
+
+                <div class="weather-box-item" style="position:relative; padding: 16px; background: rgba(6, 8, 20, 0.7); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size:11px; font-weight:700; color:var(--emerald-glow); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-plane-arrival"></i> 2. THỜI TIẾT ĐIỂM ĐẾN (DESTINATION)
+                        </div>
+                        <div id="modal-dest-status-badge" style="padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); display: flex; align-items: center; gap: 4px;">
+                            <i class="fa-solid fa-shield-halved"></i> AN TOÀN BAY
+                        </div>
+                    </div>
+                    
+                    <h4 id="modal-dest-airport" style="font-family:'Outfit'; font-size:16px; font-weight:800; color:#fff; margin-top:6px;">CLT - Charlotte Douglas</h4>
+                    
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-top:10px;">
+                        <div style="display:flex; align-items:center; gap:14px;">
+                            <span id="modal-dest-icon"></span>
+                            <div>
+                                <div id="modal-dest-temp" style="font-family:'Outfit'; font-size:28px; font-weight:900; color:#fff; line-height:1;">27.1 °C</div>
+                                <div id="modal-dest-cond" style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Mưa nhỏ nhẹ</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                            <div style="font-size:11px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 9px; border-radius:8px; display:flex; align-items:center; gap:5px;">
+                                <i class="fa-solid fa-eye" style="color:var(--cyan-glow);"></i> Tầm nhìn: <b style="color:#fff;">9.5 km</b>
+                            </div>
+                            <div style="font-size:11px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 9px; border-radius:8px; display:flex; align-items:center; gap:5px;">
+                                <i class="fa-solid fa-gauge" style="color:var(--emerald-glow);"></i> Áp suất: <b style="color:#fff;">1011 hPa</b>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+                        <div style="display:flex; gap:16px;">
+                            <span><i class="fa-solid fa-wind" style="color:#4fc3f7; margin-right:4px;"></i>Gió: <b id="modal-dest-wind" style="color:#fff;">8.4 km/h</b></span>
+                            <span><i class="fa-solid fa-droplet" style="color:#4fc3f7; margin-right:4px;"></i>Mưa: <b id="modal-dest-precip" style="color:#fff;">0.4 mm</b></span>
+                        </div>
+                        <span style="color:var(--text-muted); font-size:10px;"><i class="fa-solid fa-satellite-dish" style="color:var(--cyan-glow); margin-right:3px;"></i> Open-Meteo Sensor</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaflet Inspector Map -->
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:13px; font-weight:700; color:#fff;"><i class="fa-solid fa-map-location-dot"></i> Bản Đồ Định Vị Tàu Bay Real-Time</div>
+                <div id="inspector-map"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Security Lock Modal -->
+    <div id="admin-lock-modal" class="modal-overlay" style="display: none; z-index: 999999;">
+        <div class="inspector-modal-content" style="max-width: 440px; text-align: center; padding: 35px 25px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 242, 254, 0.1); border: 2px solid var(--cyan-glow); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 32px; color: var(--cyan-glow);"></i>
+            </div>
+            <h3 style="font-family:'Outfit'; font-size: 22px; font-weight: 800; color: #fff;">🔒 XÁC THỰC QUẢN TRỊ VIÊN</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5;">
+                Vui lòng nhập mật khẩu Admin để mở khóa và truy cập Dashboard Phân tích BigQuery.
+            </p>
+
+            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px;">
+                <input type="password" id="admin-passcode-input" class="form-control" placeholder="Nhập mật khẩu Admin..." style="text-align: center; font-size: 15px; letter-spacing: 2px; font-weight: 700;" onkeyup="if(event.key==='Enter') verifyAdminPasscode()">
+                
+                <div style="font-size: 12px; color: var(--cyan-glow); font-weight: 700; background: rgba(0, 242, 254, 0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(0, 242, 254, 0.2);">
+                    🔑 Mật khẩu Admin chính thức: <b style="color: #fff;">aeroflow2026</b>
+                </div>
+
+                <div id="admin-auth-error" style="font-size: 12px; color: #ff1744; display: none; font-weight: 700;">
+                    ❌ Mật khẩu Admin không chính xác! Vui lòng thử lại.
+                </div>
+
+                <button class="btn-search" style="width: 100%; padding: 12px; font-size: 14px; margin-top: 5px;" onclick="verifyAdminPasscode()">
+                    <i class="fa-solid fa-key"></i> 🔓 Xác Thực & Mở Khóa
+                </button>
+                <button onclick="closeAdminLockModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; text-decoration: underline;">
+                    Hủy bỏ / Quay lại Cổng Khách Hàng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quality Audit Checklist Breakdown Modal -->
+    <div id="quality-checklist-modal" class="modal-overlay" style="display: none;">
+        <div class="inspector-modal-content" style="max-width: 580px; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <div>
+                    <h3 style="font-family:'Outfit'; font-size: 20px; font-weight: 800; color: #fff;"><i class="fa-solid fa-shield-virus" style="color: var(--emerald-glow);"></i> CHECKLIST BÀI KIỂM ĐỊNH CHẤT LƯỢNG (DATA QUALITY RULES)</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Trạng thái tổng thể: <b style="color: var(--emerald-glow);">PASS 100% (5/5 Quality Rules Verified)</b></p>
+                </div>
+                <button onclick="closeQualityModal()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                    <i class="fa-solid fa-xmark"></i> Đóng
+                </button>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: rgba(6,8,20,0.6); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #fff;">1. Kiểm tra Null Khóa chính (Primary Key Null Check)</b>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Quy tắc: flight_key, FlightDate & Carrier không được chứa giá trị Null.</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--emerald-glow); background: rgba(0, 230, 118, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.3);">✅ 0 NULLS (PASS)</span>
+                </div>
+
+                <div style="background: rgba(6,8,20,0.6); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #fff;">2. Kiểm tra Trùng lặp Dòng (Physical Duplicate Check)</b>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Quy tắc: ROW_NUMBER() OVER(PARTITION BY FlightDate, Carrier, FlightNum, Origin, Dest) = 1.</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--emerald-glow); background: rgba(0, 230, 118, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.3);">✅ 0 DUPLICATES (PASS)</span>
+                </div>
+
+                <div style="background: rgba(6,8,20,0.6); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #fff;">3. Kiểm tra Toàn vẹn Khóa ngoại (FK Referential Integrity)</b>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Quy tắc: 100% Sân bay Origin & Dest phải khớp với danh mục dim_airport.</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--emerald-glow); background: rgba(0, 230, 118, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.3);">✅ 100% MATCHED (PASS)</span>
+                </div>
+
+                <div style="background: rgba(6,8,20,0.6); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #fff;">4. Kiểm tra Giới hạn Ngày (Date Boundary Range)</b>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Quy tắc: FlightDate phải nằm trong khoảng hợp lệ '2026-01-01' đến ngày hiện tại.</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--emerald-glow); background: rgba(0, 230, 118, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.3);">✅ VALID RANGE (PASS)</span>
+                </div>
+
+                <div style="background: rgba(6,8,20,0.6); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <b style="font-size: 14px; color: #fff;">5. Kiểm tra Miền Giá trị Số (Numeric Delay Value Boundary)</b>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Quy tắc: DepDelayMinutes & ArrDelayMinutes phải >= 0.</div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 800; color: var(--emerald-glow); background: rgba(0, 230, 118, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.3);">✅ VALUES >= 0 (PASS)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        let chartCarrier = null;
+        let chartWeather = null;
+        let chartMonthly = null;
+        let chartCause = null;
+        let inspectorMap = null;
+        let currentSearchData = null;
+        let isAdminAuthenticated = false;
+
+        /* Real-Time Digital Clock Timer */
+        function updateLiveClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            const clockTimeEl = document.getElementById('live-clock-time');
+            const clockDateEl = document.getElementById('live-clock-date');
+            if (clockTimeEl) clockTimeEl.innerText = timeStr;
+            if (clockDateEl) clockDateEl.innerText = dateStr;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        /* Weather icon helper — maps condition text → vibrant FontAwesome HTML */
+        function getWeatherIconHTML(condition) {
+            if (!condition) return '<i class="fa-solid fa-sun" style="font-size:32px; color:#ffb703; filter:drop-shadow(0 0 10px rgba(255,183,3,0.8));"></i>';
+            const c = condition.toLowerCase();
+            if (c.includes('tuyết') || c.includes('snow')) {
+                return '<i class="fa-solid fa-snowflake" style="font-size:32px; color:#80d8ff; filter:drop-shadow(0 0 10px rgba(128,216,255,0.8));"></i>';
+            }
+            if (c.includes('sấm') || c.includes('giông') || c.includes('thunder') || c.includes('storm')) {
+                return '<i class="fa-solid fa-cloud-bolt" style="font-size:32px; color:#e040fb; filter:drop-shadow(0 0 10px rgba(224,64,251,0.8));"></i>';
+            }
+            if (c.includes('mưa to') || c.includes('mưa lớn') || c.includes('heavy rain')) {
+                return '<i class="fa-solid fa-cloud-showers-heavy" style="font-size:32px; color:#00f2fe; filter:drop-shadow(0 0 10px rgba(0,242,254,0.8));"></i>';
+            }
+            if (c.includes('mưa') || c.includes('rain')) {
+                return '<i class="fa-solid fa-cloud-sun-rain" style="font-size:32px; color:#4facfe; filter:drop-shadow(0 0 10px rgba(79,172,254,0.8));"></i>';
+            }
+            if (c.includes('sương mù') || c.includes('fog')) {
+                return '<i class="fa-solid fa-smog" style="font-size:32px; color:#94a3b8; filter:drop-shadow(0 0 10px rgba(148,163,184,0.8));"></i>';
+            }
+            if (c.includes('mây') || c.includes('cloud')) {
+                return '<i class="fa-solid fa-cloud-sun" style="font-size:32px; color:#a5f3fc; filter:drop-shadow(0 0 10px rgba(165,243,252,0.8));"></i>';
+            }
+            return '<i class="fa-solid fa-sun" style="font-size:32px; color:#ffb703; filter:drop-shadow(0 0 10px rgba(255,183,3,0.8));"></i>';
+        }
+
+        function getWeatherIcon(condition) {
+            return getWeatherIconHTML(condition);
+        }
+
+        function getWeatherLabel(condition) {
+            if (!condition) return 'Bình thường';
+            const c = condition.toLowerCase();
+            if (c.includes('tuyết') || c.includes('bão')) return 'Nguy hiểm bay';
+            if (c.includes('sấm') || c.includes('giông')) return 'Cảnh báo bay';
+            if (c.includes('mưa to') || c.includes('mưa lớn')) return 'Hạn chế bay';
+            if (c.includes('mưa')) return 'Canh chừng mưa';
+            if (c.includes('sương mù') || c.includes('mù')) return 'Tầm nhìn hạn chế';
+            if (c.includes('mây') || c.includes('u ám')) return 'Bay bình thường';
+            if (c.includes('quang') || c.includes('nắng') || c.includes('thuận lợi')) return 'Thuận lợi bay';
+            return 'Bình thường';
+        }
+
+        function switchPortal(portal) {
+            if (portal === 'admin') {
+                /* GUARD: always require auth before showing admin */
+                if (!isAdminAuthenticated) {
+                    openAdminLockModal();
+                    return; /* block — do NOT show admin section */
+                }
+                document.getElementById('customer-portal-section').style.display = 'none';
+                document.getElementById('admin-portal-section').style.display = 'flex';
+                document.getElementById('tab-customer').classList.remove('active');
+                document.getElementById('tab-admin').classList.add('active');
+                document.getElementById('role-badge').innerHTML = '<i class="fa-solid fa-user-shield"></i> ADMIN VERIFIED';
+                document.getElementById('role-badge').className = 'role-badge role-admin';
+                fetchStats();
+            } else {
+                document.getElementById('admin-portal-section').style.display = 'none';
+                document.getElementById('customer-portal-section').style.display = 'flex';
+                document.getElementById('tab-admin').classList.remove('active');
+                document.getElementById('tab-customer').classList.add('active');
+                document.getElementById('role-badge').innerHTML = '<i class="fa-solid fa-user-check"></i> CUSTOMER PORTAL';
+                document.getElementById('role-badge').className = 'role-badge role-customer';
+            }
+        }
+
+        function openAdminLockModal() {
+            document.getElementById('admin-passcode-input').value = '';
+            document.getElementById('admin-auth-error').style.display = 'none';
+            document.getElementById('admin-lock-modal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('admin-passcode-input').focus();
+            }, 100);
+        }
+
+        function closeAdminLockModal() {
+            document.getElementById('admin-lock-modal').style.display = 'none';
+        }
+
+        function verifyAdminPasscode() {
+            const password = document.getElementById('admin-passcode-input').value;
+            
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    isAdminAuthenticated = true;
+                    closeAdminLockModal();
+                    switchPortal('admin');
+                } else {
+                    document.getElementById('admin-auth-error').style.display = 'block';
+                }
+            })
+            .catch(err => {
+                document.getElementById('admin-auth-error').innerText = "❌ Lỗi kết nối máy chủ xác thực.";
+                document.getElementById('admin-auth-error').style.display = 'block';
+            });
+        }
+
+        function openQualityModal() {
+            document.getElementById('quality-checklist-modal').style.display = 'flex';
+        }
+
+        function closeQualityModal() {
+            document.getElementById('quality-checklist-modal').style.display = 'none';
+        }
+
+        const AIRPORT_COORDS = {
+            "ATL": [33.6407, -84.4277],
+            "LAX": [33.9416, -118.4085],
+            "ORD": [41.9742, -87.9073],
+            "DFW": [32.8998, -97.0403],
+            "DEN": [39.8561, -104.6737],
+            "JFK": [40.6413, -73.7781],
+            "EWR": [40.6895, -74.1745],
+            "CLT": [35.2140, -80.9431],
+            "SFO": [37.6213, -122.3790],
+            "SEA": [47.4502, -122.3088],
+            "LAS": [36.0840, -115.1537],
+            "MCO": [28.4312, -81.3081],
+            "BOS": [42.3656, -71.0096],
+            "PHX": [33.4352, -112.0101],
+            "IAH": [29.9902, -95.3368],
+            "MIA": [25.7959, -80.2870]
+        };
+
+        const ROUTE_NETWORK = {
+            "ATL": ["LAX", "ORD", "DFW", "DEN", "JFK", "MIA", "CLT", "EWR"],
+            "LAX": ["ATL", "JFK", "ORD", "SFO", "SEA", "LAS"],
+            "ORD": ["ATL", "LAX", "DFW", "DEN", "BOS", "EWR"],
+            "DFW": ["ATL", "ORD", "LAX", "DEN", "IAH", "PHX"],
+            "DEN": ["ATL", "ORD", "DFW", "LAX", "SEA", "LAS"],
+            "JFK": ["ATL", "LAX", "MIA", "BOS", "SFO", "CLT"],
+            "EWR": ["CLT", "ATL", "ORD", "MIA", "LAX", "BOS"],
+            "CLT": ["EWR", "ATL", "JFK", "ORD", "DFW", "MIA"],
+            "SFO": ["LAX", "JFK", "SEA", "ORD", "DEN"],
+            "SEA": ["SFO", "LAX", "DEN", "ORD", "BOS"]
+        };
+
+        const AIRLINE_OPTIONS = {
+            "ATL": ["DL - Delta Air Lines", "AA - American Airlines", "UA - United Airlines", "WN - Southwest Airlines"],
+            "LAX": ["DL - Delta Air Lines", "AA - American Airlines", "UA - United Airlines", "AS - Alaska Airlines"],
+            "ORD": ["UA - United Airlines", "AA - American Airlines", "DL - Delta Air Lines"],
+            "DFW": ["AA - American Airlines", "DL - Delta Air Lines", "WN - Southwest Airlines"],
+            "JFK": ["B6 - JetBlue", "DL - Delta Air Lines", "AA - American Airlines"],
+            "EWR": ["UA - United Airlines", "DL - Delta Air Lines", "AA - American Airlines"]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDynamicFilterOptions();
+            doCustomerSearch();
+            fetchStats();
+        });
+
+        function fetchDynamicFilterOptions() {
+            fetch('/api/filter-options')
+                .then(res => res.json())
+                .then(data => {
+                    const origSelect = document.getElementById('search-origin');
+                    const destSelect = document.getElementById('search-dest');
+                    const tailSelect = document.getElementById('search-tail');
+                    
+                    const origs = (data.airports && data.airports.length > 0) ? data.airports : (data.origins || []);
+                    const dests = (data.dests && data.dests.length > 0) ? data.dests : [];
+                    
+                    if (origs.length > 0) {
+                        let origHtml = '<option value="">-- Tất cả Sân bay --</option>';
+                        origs.forEach(ap => {
+                            origHtml += `<option value="${ap.code}">${ap.name}</option>`;
+                        });
+                        origSelect.innerHTML = origHtml;
+
+                        const adminApSelect = document.getElementById('filter-airport');
+                        if (adminApSelect) {
+                            adminApSelect.innerHTML = '<option value="all">🌐 Tất cả Sân Bay</option>' +
+                                origs.map(ap => `<option value="${ap.code}">${ap.name}</option>`).join('');
+                        }
+                    }
+
+                    if (dests.length > 0) {
+                        let destHtml = '<option value="">-- Tất cả Sân bay --</option>';
+                        dests.forEach(ap => {
+                            destHtml += `<option value="${ap.code}">${ap.name}</option>`;
+                        });
+                        destSelect.innerHTML = destHtml;
+                    }
+
+                    if (data.airlines && data.airlines.length > 0) {
+                        let alHtml = '<option value="">-- Tất cả Hãng bay --</option>';
+                        data.airlines.forEach(al => {
+                            alHtml += `<option value="${al.code}">${al.name} (${al.code})</option>`;
+                        });
+                        tailSelect.innerHTML = alHtml;
+
+                        const adminAlSelect = document.getElementById('filter-airline');
+                        if (adminAlSelect) {
+                            adminAlSelect.innerHTML = '<option value="all">✈️ Tất cả Hãng Bay</option>' + 
+                                data.airlines.map(al => `<option value="${al.code}">${al.name}</option>`).join('');
+                        }
+                    }
+
+                    if (data.months && data.months.length > 0) {
+                        const adminMSelect = document.getElementById('filter-month');
+                        if (adminMSelect) {
+                            adminMSelect.innerHTML = '<option value="all">📅 Tất cả Tháng</option>' +
+                                data.months.map(m => `<option value="${m}">Tháng ${m}</option>`).join('');
+                        }
+                    }
+                });
+        }
+
+        function onOriginChange() {
+            const orig = document.getElementById('search-origin').value;
+            const destSelect = document.getElementById('search-dest');
+            const tailSelect = document.getElementById('search-tail');
+
+            if (!orig) {
+                doCustomerSearch();
+                return;
+            }
+
+            fetch(`/api/routes?origin=${orig}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.dests && data.dests.length > 0) {
+                        destSelect.innerHTML = '<option value="">-- Tất cả Sân bay đến --</option>' +
+                            data.dests.map(d => `<option value="${d.code}">${d.name}</option>`).join('');
+                    }
+                    if (data.airlines && data.airlines.length > 0) {
+                        tailSelect.innerHTML = '<option value="">-- Tất cả Hãng bay --</option>' +
+                            data.airlines.map(al => `<option value="${al.code}">${al.name}</option>`).join('');
+                    }
+                    doCustomerSearch();
+                })
+                .catch(() => doCustomerSearch());
+        }
+
+        function onDestChange() {
+            doCustomerSearch();
+        }
+
+        function doCustomerSearch() {
+            const dt = document.getElementById('search-date').value;
+            const orig = document.getElementById('search-origin').value;
+            const dest = document.getElementById('search-dest').value;
+            const tail = document.getElementById('search-tail').value;
+
+            document.getElementById('search-count-badge').innerText = "Đang quét BigQuery...";
+
+            fetch(`/api/search?date=${dt}&origin=${orig}&dest=${dest}&tail=${tail}`)
+                .then(res => res.json())
+                .then(data => {
+                    currentSearchData = data;
+                    const fList = document.getElementById('flight-results-container');
+                    
+                    if (data.flights && data.flights.length > 0) {
+                        const countStr = data.total_found ? Number(data.total_found).toLocaleString() : data.flights.length;
+                        document.getElementById('search-count-badge').innerText = `🔍 Tìm thấy ${countStr} chuyến thực tế`;
+                        
+                        fList.innerHTML = data.flights.map((f, idx) => `
+                            <div class="flight-item-card" onclick="openInspectorModal(${idx})">
+                                <div class="flight-main-info">
+                                    <div class="airline-badge">${f.airline}</div>
+                                    <div class="flight-route">
+                                        <div class="route-cities">${f.origin} <i class="fa-solid fa-arrow-right-long" style="font-size:14px; color:var(--cyan-glow);"></i> ${f.dest}</div>
+                                        <div class="route-meta">Chuyến ${f.airline}${f.flight_num} (${f.tail_num}) | Cất cánh: <b>${f.dep_time}</b> - Hạ cánh: <b>${f.arr_time}</b></div>
+                                        <span class="click-hint"><i class="fa-solid fa-arrow-up-right-from-square"></i> Bấm xem chi tiết & bản đồ</span>
+                                    </div>
+                                </div>
+                                <div class="risk-score-badge" style="background: rgba(255,255,255,0.03); border: 1px solid ${f.risk_color};">
+                                    <div class="risk-val" style="color: ${f.risk_color};">${f.risk_score}%</div>
+                                    <div class="risk-label" style="color: ${f.risk_color};">${f.risk_level}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        document.getElementById('search-count-badge').innerText = "0 chuyến bay";
+                        fList.innerHTML = `<div style="color: var(--text-muted); padding: 20px; text-align:center;">Không tìm thấy chuyến bay phù hợp với bộ lọc trong kho BigQuery.</div>`;
+                    }
+
+                    if (data.origin_weather) {
+                        document.getElementById('weather-airport-title').innerText = data.origin_weather.airport_code + ' (' + data.origin_weather.airport_name + ')';
+                        document.getElementById('weather-condition-text').innerText = data.origin_weather.condition;
+                        document.getElementById('weather-temp-range').innerText = data.origin_weather.temp_max;
+                        document.getElementById('weather-precip').innerText = data.origin_weather.precipitation;
+                        document.getElementById('weather-origin-icon').innerHTML = getWeatherIconHTML(data.origin_weather.condition);
+                    }
+
+                    if (data.dest_weather) {
+                        document.getElementById('weather-dest-airport-title').innerText = data.dest_weather.airport_code + ' (' + data.dest_weather.airport_name + ')';
+                        document.getElementById('weather-dest-condition-text').innerText = data.dest_weather.condition;
+                        document.getElementById('weather-dest-temp-range').innerText = data.dest_weather.temp_max;
+                        document.getElementById('weather-dest-precip').innerText = data.dest_weather.precipitation;
+                        document.getElementById('weather-dest-icon').innerHTML = getWeatherIconHTML(data.dest_weather.condition);
+                    }
+
+                    if (data.best_days) {
+                        document.getElementById('best-days-list').innerHTML = data.best_days.map(bd => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(6,8,20,0.4); border-radius: 6px; border: 1px solid var(--border-color);">
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">${bd.day}</span>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 10px; font-weight: 700; color: ${bd.status.includes('tốt nhất') ? '#00e676' : (bd.status.includes('Ùn tắc') ? '#ff1744' : '#ffb703')};">${bd.status}</span>
+                                    <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary);">${bd.avg_delay} min</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (data.rankings) {
+                        document.getElementById('airline-rankings-list').innerHTML = data.rankings.map((r, idx) => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(6,8,20,0.5); border-radius: 8px; border: 1px solid var(--border-color);">
+                                <span style="font-size: 13px; font-weight: 600;">#${idx+1} ${r.airline}</span>
+                                <span style="font-family:'Outfit'; font-weight:800; color: ${r.badge};">${r.on_time_pct}%</span>
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+
+        function openInspectorModal(flightIdx) {
+            if (!currentSearchData || !currentSearchData.flights[flightIdx]) return;
+            const f = currentSearchData.flights[flightIdx];
+
+            document.getElementById('modal-flight-code').innerText = `${f.airline_name || f.airline} ${f.airline}${f.flight_num}`;
+            document.getElementById('modal-aircraft-info').innerText = `${f.aircraft_type} | Số đuôi: ${f.tail_num} | Ngày bay: ${f.date}`;
+            document.getElementById('modal-route-title').innerText = `${f.origin} ➔ ${f.dest}`;
+            document.getElementById('modal-distance').innerText = `${f.distance_miles} miles`;
+            document.getElementById('modal-duration').innerText = `${Math.floor(f.elapsed_min / 60)}h ${f.elapsed_min % 60}m`;
+            
+            document.getElementById('modal-risk-badge-box').innerHTML = `
+                <div style="padding:10px 20px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid ${f.risk_color}; text-align:right;">
+                    <div style="font-family:'Outfit'; font-size:24px; font-weight:900; color:${f.risk_color};">${f.risk_score}%</div>
+                    <div style="font-size:10px; font-weight:800; color:${f.risk_color}; uppercase;">${f.risk_level}</div>
+                </div>
+            `;
+
+            if (currentSearchData.origin_weather) {
+                const oCond = currentSearchData.origin_weather.condition;
+                document.getElementById('modal-orig-airport').innerText = `${f.origin} - ${f.origin_name}`;
+                document.getElementById('modal-orig-temp').innerText = currentSearchData.origin_weather.temp_max;
+                document.getElementById('modal-orig-cond').innerText = oCond;
+                document.getElementById('modal-orig-wind').innerText = currentSearchData.origin_weather.wind_speed;
+                document.getElementById('modal-orig-precip').innerText = currentSearchData.origin_weather.precipitation;
+                document.getElementById('modal-orig-icon').innerHTML = getWeatherIconHTML(oCond);
+                
+                const oLabel = getWeatherLabel(oCond);
+                const isGood = oLabel.includes('Thuận lợi') || oLabel.includes('Bình thường');
+                const badgeEl = document.getElementById('modal-orig-status-badge');
+                if (badgeEl) {
+                    badgeEl.innerHTML = isGood 
+                        ? '<i class="fa-solid fa-shield-halved"></i> AN TOÀN BAY' 
+                        : '<i class="fa-solid fa-triangle-exclamation"></i> CHÚ Ý THỜI TIẾT';
+                    badgeEl.style.background = isGood ? 'rgba(0, 230, 118, 0.12)' : 'rgba(255, 183, 3, 0.12)';
+                    badgeEl.style.color = isGood ? '#00e676' : '#ffb703';
+                    badgeEl.style.borderColor = isGood ? 'rgba(0, 230, 118, 0.3)' : 'rgba(255, 183, 3, 0.3)';
+                }
+            }
+
+            if (currentSearchData.dest_weather) {
+                const dCond = currentSearchData.dest_weather.condition;
+                document.getElementById('modal-dest-airport').innerText = `${f.dest} - ${f.dest_name}`;
+                document.getElementById('modal-dest-temp').innerText = currentSearchData.dest_weather.temp_max;
+                document.getElementById('modal-dest-cond').innerText = dCond;
+                document.getElementById('modal-dest-wind').innerText = currentSearchData.dest_weather.wind_speed;
+                document.getElementById('modal-dest-precip').innerText = currentSearchData.dest_weather.precipitation;
+                document.getElementById('modal-dest-icon').innerHTML = getWeatherIconHTML(dCond);
+                
+                const dLabel = getWeatherLabel(dCond);
+                const isGoodD = dLabel.includes('Thuận lợi') || dLabel.includes('Bình thường');
+                const badgeDestEl = document.getElementById('modal-dest-status-badge');
+                if (badgeDestEl) {
+                    badgeDestEl.innerHTML = isGoodD 
+                        ? '<i class="fa-solid fa-shield-halved"></i> AN TOÀN BAY' 
+                        : '<i class="fa-solid fa-triangle-exclamation"></i> CHÚ Ý THỜI TIẾT';
+                    badgeDestEl.style.background = isGoodD ? 'rgba(0, 230, 118, 0.12)' : 'rgba(255, 183, 3, 0.12)';
+                    badgeDestEl.style.color = isGoodD ? '#00e676' : '#ffb703';
+                    badgeDestEl.style.borderColor = isGoodD ? 'rgba(0, 230, 118, 0.3)' : 'rgba(255, 183, 3, 0.3)';
+                }
+            }
+
+            document.getElementById('flight-inspector-modal').style.display = 'flex';
+
+            setTimeout(() => {
+                renderInspectorMap(f.origin, f.dest);
+            }, 200);
+        }
+
+        function closeInspectorModal() {
+            document.getElementById('flight-inspector-modal').style.display = 'none';
+        }
+
+        function renderInspectorMap(origCode, destCode) {
+            const origCoords = AIRPORT_COORDS[origCode] || AIRPORT_COORDS["EWR"];
+            const destCoords = AIRPORT_COORDS[destCode] || AIRPORT_COORDS["CLT"];
+
+            if (!inspectorMap) {
+                inspectorMap = L.map('inspector-map').setView([39.8283, -98.5795], 4);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap, CartoDB Voyager'
+                }).addTo(inspectorMap);
+            } else {
+                inspectorMap.invalidateSize();
+            }
+
+            inspectorMap.eachLayer((layer) => {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+                    inspectorMap.removeLayer(layer);
+                }
+            });
+
+            L.circleMarker(origCoords, {
+                radius: 8,
+                fillColor: '#00e676',
+                color: '#ffffff',
+                weight: 2,
+                fillOpacity: 0.9
+            }).addTo(inspectorMap).bindPopup(`<b>Khởi hành: ${origCode}</b>`);
+
+            L.circleMarker(destCoords, {
+                radius: 8,
+                fillColor: '#00f2fe',
+                color: '#ffffff',
+                weight: 2,
+                fillOpacity: 0.9
+            }).addTo(inspectorMap).bindPopup(`<b>Điểm đến: ${destCode}</b>`);
+
+            const latlngs = [origCoords, destCoords];
+            const polyline = L.polyline(latlngs, {
+                color: '#1e293b',
+                weight: 2.5,
+                opacity: 0.65,
+                dashArray: '5, 5'
+            }).addTo(inspectorMap);
+
+            inspectorMap.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+
+            const midLat = (origCoords[0] + destCoords[0]) / 2;
+            const midLng = (origCoords[1] + destCoords[1]) / 2;
+            const planeIcon = L.divIcon({
+                html: '<i class="fa-solid fa-plane" style="color: #ffb703; font-size: 22px; transform: rotate(45deg);"></i>',
+                className: 'custom-plane-icon'
+            });
+            L.marker([midLat, midLng], { icon: planeIcon }).addTo(inspectorMap).bindPopup(`<b>Định vị Chuyến bay ${origCode} ➔ ${destCode}</b>`);
+        }
+
+        function fetchStats() {
+            const y = document.getElementById('filter-year') ? document.getElementById('filter-year').value : 'all';
+            const q = document.getElementById('filter-quarter') ? document.getElementById('filter-quarter').value : 'all';
+            const m = document.getElementById('filter-month') ? document.getElementById('filter-month').value : 'all';
+            const al = document.getElementById('filter-airline') ? document.getElementById('filter-airline').value : 'all';
+            const ap = document.getElementById('filter-airport') ? document.getElementById('filter-airport').value : 'all';
+
+            fetch(`/api/stats?year=${y}&quarter=${q}&month=${m}&airline=${encodeURIComponent(al)}&airport=${ap}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('kpi-total-flights').innerText = Number(data.total_flights).toLocaleString();
+                    document.getElementById('kpi-avg-delay').innerText = Number(data.avg_delay_minutes).toFixed(2) + ' min';
+                    if (data.on_time_rate) document.getElementById('kpi-ontime-rate').innerText = data.on_time_rate + '%';
+                    if (data.total_airports) document.getElementById('kpi-airports').innerText = Number(data.total_airports).toLocaleString();
+                    if (data.total_runways) document.getElementById('kpi-runways').innerText = Number(data.total_runways).toLocaleString();
+                    if (data.total_carriers) document.getElementById('kpi-carriers').innerText = data.total_carriers;
+                    
+                    if (data.airport_hotspots) {
+                        document.getElementById('airport-hotspots-container').innerHTML = data.airport_hotspots.map(ap => `
+                            <div class="hotspot-card-item">
+                                <div class="hotspot-row">
+                                    <div>
+                                        <b style="font-family:'Outfit'; font-size:14px; color:#fff;">${ap.code} (${ap.name})</b>
+                                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Trễ TB: <b>${ap.avg_delay} min</b></div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <span style="font-size:10px; font-weight:700; color:var(--warning-color); background:rgba(255,183,3,0.1); padding:3px 8px; border-radius:6px; border:1px solid rgba(255,183,3,0.3);">${ap.badge}</span>
+                                        <div style="font-family:'Outfit'; font-size:13px; font-weight:800; color:#fff; margin-top:3px;">${ap.delayed_flights.toLocaleString()} chuyến</div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: ${ap.pct}%;"></div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (data.delayed_aircraft_list) {
+                        document.getElementById('delayed-aircraft-container').innerHTML = data.delayed_aircraft_list.map(ac => `
+                            <div class="hotspot-card-item">
+                                <div class="hotspot-row">
+                                    <div>
+                                        <b style="font-family:'Outfit'; font-size:14px; color:var(--cyan-glow);">${ac.tail}</b> <span style="font-size:12px; color:var(--text-secondary);">(${ac.model})</span>
+                                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Hãng: <b>${ac.airline}</b></div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <span style="font-size:10px; font-weight:800; color:var(--danger-color); background:rgba(255,23,68,0.12); padding:3px 8px; border-radius:6px; border:1px solid rgba(255,23,68,0.3);">${ac.delay_count} LẦN TRỄ</span>
+                                        <div style="font-size:11px; color:var(--text-muted); margin-top:3px;">TB: <b style="color:#fff;">${ac.avg_delay} min</b></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (data.etl_timeline && document.getElementById('etl-timeline-tbody')) {
+                        document.getElementById('etl-timeline-tbody').innerHTML = data.etl_timeline.map(row => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                <td style="padding: 10px 12px; font-weight: 700; color: #fff;">${row.time}</td>
+                                <td style="padding: 10px 12px; color: var(--cyan-glow); font-weight: 600;">${row.job}</td>
+                                <td style="padding: 10px 12px;">${row.source}</td>
+                                <td style="padding: 10px 12px; font-weight: 800; color: ${row.time.includes('2026-01-01') ? '#b15cff' : 'var(--cyan-glow)'};">${row.count}</td>
+                                <td style="padding: 10px 12px;">${row.duration}</td>
+                                <td style="padding: 10px 12px;"><span style="color: var(--emerald-glow); background: rgba(0, 230, 118, 0.1); padding: 3px 8px; border-radius: 4px; font-weight: 700;">${row.status}</span></td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    renderCharts(data);
+                });
+        }
+
+        function triggerStep(step) {
+            const consoleEl = document.getElementById('terminal-console');
+            consoleEl.innerHTML += `\n\n[INFO] Khởi tạo thực thi bước [${step.toUpperCase()}] lúc ${new Date().toLocaleTimeString()}...`;
+            
+            fetch(`/api/run/${step}?trigger=manual`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        consoleEl.innerHTML += `\n<span class="terminal-log-success">[SUCCESS] ${data.message}</span>`;
+                        if (data.logs) consoleEl.innerHTML += `\n${data.logs}`;
+                        
+                        // Lập tức làm mới toàn bộ KPI Admin, Biểu đồ và Bộ lọc động!
+                        fetchStats();
+                        fetchDynamicFilterOptions();
+                    } else {
+                        consoleEl.innerHTML += `\n<span class="terminal-log-error">[ERROR] ${data.message}</span>`;
+                    }
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                });
+        }
+
+        function renderCharts(data) {
+            const ctx1 = document.getElementById('chartCarrier').getContext('2d');
+            if (chartCarrier) chartCarrier.destroy();
+            chartCarrier = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: data.carriers,
+                    datasets: [{
+                        label: 'Phút trễ trung bình',
+                        data: data.carrier_delays,
+                        backgroundColor: ['#00f2fe', '#00e676', '#b15cff', '#ffb703', '#ff416c'],
+                        borderRadius: 8
+                    }]
+                },
+                options: getChartOptions()
+            });
+
+            const ctx2 = document.getElementById('chartWeather').getContext('2d');
+            if (chartWeather) chartWeather.destroy();
+            chartWeather = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: data.weather_labels,
+                    datasets: [{
+                        label: 'Phút trễ theo thời tiết',
+                        data: data.weather_delays,
+                        backgroundColor: ['#00e676', '#ffb703', '#ff416c', '#d50000'],
+                        borderRadius: 8
+                    }]
+                },
+                options: getChartOptions()
+            });
+
+            const ctx3 = document.getElementById('chartMonthly').getContext('2d');
+            if (chartMonthly) chartMonthly.destroy();
+            
+            const gradMonthly = ctx3.createLinearGradient(0, 0, 0, 200);
+            gradMonthly.addColorStop(0, 'rgba(177, 92, 255, 0.4)');
+            gradMonthly.addColorStop(1, 'rgba(177, 92, 255, 0.0)');
+
+            chartMonthly = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: data.monthly_labels,
+                    datasets: [{
+                        label: 'Xu hướng trễ theo tháng (Phút)',
+                        data: data.monthly_delays,
+                        borderColor: '#b15cff',
+                        backgroundColor: gradMonthly,
+                        fill: true,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00f2fe',
+                        pointRadius: 5
+                    }]
+                },
+                options: getChartOptions()
+            });
+
+            const ctx4 = document.getElementById('chartCause').getContext('2d');
+            if (chartCause) chartCause.destroy();
+            chartCause = new Chart(ctx4, {
+                type: 'doughnut',
+                data: {
+                    labels: data.cause_labels,
+                    datasets: [{
+                        data: data.cause_values,
+                        backgroundColor: ['#00f2fe', '#b15cff', '#ffb703', '#ff416c', '#00e676'],
+                        borderWidth: 2,
+                        borderColor: '#060814'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: { 
+                                color: '#cbd5e1', 
+                                font: { size: 10, family: 'Inter' },
+                                boxWidth: 10,
+                                padding: 8
+                            } 
+                        } 
+                    } 
+                }
+            });
+        }
+
+        function getChartOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                    y: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+                }
+            };
+        }
+
+        setInterval(() => {
+            if (isAdminAuthenticated) {
+                fetchStats();
+            }
+        }, 15000);
+    </script>
+</body>
+</html>

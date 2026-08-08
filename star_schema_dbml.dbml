@@ -1,0 +1,145 @@
+// ============================================================
+// AEROFLOW - STAR SCHEMA DATA MODEL (dbdiagram.io / DBML)
+// Phù hợp 100% với Sơ đồ mô hình hình sao (Gold Zone DWH)
+// ============================================================
+
+Table dim_airport {
+  airport_key varchar(10) [pk]
+  airport_name varchar(150)
+  city varchar(100)
+  state varchar(100)
+  country varchar(100)
+  latitude decimal
+  longitude decimal
+  elevation_ft int
+  timezone_offset int
+  runway_count int
+  max_runway_length_ft int
+}
+
+Table dim_date {
+  date_key date [pk]
+  year int
+  quarter int
+  month int
+  month_name varchar(20)
+  day int
+  day_of_week varchar(20)
+  day_name varchar(20)
+  is_weekend boolean
+  is_holiday boolean
+  holiday_name varchar(100)
+  season varchar(20)
+}
+
+Table dim_weather {
+  weather_key varchar(30) [pk]
+  airport_key varchar(10) [ref: > dim_airport.airport_key]
+  date_key date [ref: > dim_date.date_key]
+  temp_max_c decimal
+  temp_min_c decimal
+  precipitation_mm decimal
+  snowfall_cm decimal
+  wind_speed_kmh decimal
+  weather_condition varchar(50)
+}
+
+Table dim_carrier {
+  carrier_key varchar(10) [pk]
+  carrier_name varchar(150)
+  carrier_group varchar(50)
+  country varchar(100)
+}
+
+Table dim_aircraft {
+  aircraft_key varchar(20) [pk]
+  carrier_key varchar(10) [ref: > dim_carrier.carrier_key]
+  manufacturer varchar(100)
+  model varchar(100)
+  aircraft_type varchar(50)
+  capacity_seats int
+  manufacture_year int
+  aircraft_age_years int
+}
+
+Table dim_crew {
+  crew_key varchar(20) [pk]
+  carrier_key varchar(10) [ref: > dim_carrier.carrier_key]
+  full_name varchar(150)
+  role varchar(50)
+  license_number varchar(50)
+  license_type varchar(50)
+}
+
+Table fact_crew_assignment {
+  crew_key varchar(20) [ref: > dim_crew.crew_key]
+  aircraft_key varchar(20) [ref: > dim_aircraft.aircraft_key]
+  duty_hours decimal
+  performance_rating decimal
+
+  indexes {
+    (crew_key, aircraft_key) [pk]
+  }
+}
+
+Table dim_cancellation_reason {
+  cancellation_code varchar(5) [pk]
+  cancellation_desc varchar(150)
+}
+
+Table fact_flights {
+  flight_key varchar(50) [pk]
+  carrier_key varchar(10) [ref: > dim_carrier.carrier_key]
+  aircraft_key varchar(20) [ref: > dim_aircraft.aircraft_key]
+  origin_airport_key varchar(10) [ref: > dim_airport.airport_key]
+  dest_airport_key varchar(10) [ref: > dim_airport.airport_key]
+  origin_weather_key varchar(30) [ref: > dim_weather.weather_key]
+  dest_weather_key varchar(30) [ref: > dim_weather.weather_key]
+  cancellation_code varchar(5) [ref: > dim_cancellation_reason.cancellation_code]
+  flight_number varchar(10)
+  tail_number_sha256 varchar(64)
+  dep_delay_min int
+  arr_delay_min int
+  cancelled boolean
+  diverted boolean
+  distance_miles decimal
+  taxi_out_min int
+  taxi_in_min int
+  air_time_min int
+  actual_elapsed_min int
+  carrier_delay_min int
+  weather_delay_min int
+  nas_delay_min int
+  security_delay_min int
+  late_aircraft_delay_min int
+}
+
+Table dim_passenger {
+  passenger_key varchar(20) [pk]
+  full_name varchar(150)
+  gender varchar(10)
+  nationality varchar(100)
+  date_of_birth date
+  loyalty_tier varchar(50)
+}
+
+Table dim_ticket {
+  ticket_key varchar(20) [pk]
+  booking_reference varchar(20)
+  fare_class varchar(20)
+  ticket_price_usd decimal
+  purchase_date date
+}
+
+Table fact_passenger_manifest {
+  flight_key varchar(50) [ref: > fact_flights.flight_key]
+  passenger_key varchar(20) [ref: > dim_passenger.passenger_key]
+  ticket_key varchar(20) [ref: > dim_ticket.ticket_key]
+  checkin_time datetime
+  baggage_weight_kg decimal
+  seat_number varchar(10)
+
+  indexes {
+    (flight_key, passenger_key) [pk]
+  }
+}

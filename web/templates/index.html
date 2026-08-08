@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroFlow - US Flight Delay Analytics Dashboard</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i class="fa-solid fa-plane-departure logo-icon"></i>
+                <span class="logo-text">Aero<span>Flow</span></span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="nav-dashboard-btn">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" id="login-nav-item">
+                    <i class="fa-solid fa-lock" id="login-nav-icon"></i>
+                    <span id="login-btn-text">Đăng nhập</span>
+                </a>
+                <a href="#about" class="nav-item" id="nav-about-btn">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Giới thiệu</span>
+                </a>
+            </nav>
+            <div class="connection-status-card" id="connection-card">
+                <div class="pulse-indicator orange" id="status-pulse"></div>
+                <div class="status-info">
+                    <p class="status-label">Trạng thái kết nối</p>
+                    <p class="status-value" id="status-text">Đang kiểm tra...</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Phân Tích Hiệu Suất Chuyến Bay Mỹ 2024</h1>
+                    <p>Hệ thống pipeline & kho dữ liệu tích hợp yếu tố thời tiết và ngày lễ công cộng</p>
+                </div>
+                <div class="user-profile">
+                    <span class="badge" id="role-badge">PUBLIC USER</span>
+                    <i class="fa-solid fa-database db-icon"></i>
+                </div>
+            </header>
+
+            <!-- FILTER BAR -->
+            <section class="filter-section card">
+                <div class="filter-header">
+                    <i class="fa-solid fa-sliders"></i>
+                    <h2>Bộ lọc dữ liệu</h2>
+                </div>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="carrier-select">Hãng hàng không</label>
+                        <select id="carrier-select">
+                            <option value="ALL">Tất cả các hãng (ALL)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="airport-select">Sân bay nguồn (Origin)</label>
+                        <select id="airport-select">
+                            <option value="ALL">Tất cả sân bay (ALL)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="month-select">Tháng trong năm</label>
+                        <select id="month-select">
+                            <option value="ALL">Tất cả các tháng (ALL)</option>
+                            <option value="1">Tháng 1</option>
+                            <option value="2">Tháng 2</option>
+                            <option value="3">Tháng 3</option>
+                            <option value="4">Tháng 4</option>
+                            <option value="5">Tháng 5</option>
+                            <option value="6">Tháng 6</option>
+                            <option value="7">Tháng 7</option>
+                            <option value="8">Tháng 8</option>
+                            <option value="9">Tháng 9</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </select>
+                    </div>
+                    <div class="filter-group toggle-group">
+                        <label for="holiday-toggle">Chỉ xem ngày Lễ?</label>
+                        <label class="switch">
+                            <input type="checkbox" id="holiday-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="filter-actions">
+                        <button id="apply-filters-btn" class="btn btn-primary">
+                            <i class="fa-solid fa-sync"></i> Áp dụng
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPI GRID -->
+            <section class="kpi-grid">
+                <div class="kpi-card card">
+                    <div class="kpi-icon blue"><i class="fa-solid fa-plane"></i></div>
+                    <div class="kpi-data">
+                        <h3>Tổng Chuyến Bay</h3>
+                        <p class="kpi-value" id="kpi-total-flights">0</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon red"><i class="fa-solid fa-plane-slash"></i></div>
+                    <div class="kpi-data">
+                        <h3>Chuyến Bị Hủy</h3>
+                        <p class="kpi-value" id="kpi-total-cancelled">0</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon orange"><i class="fa-solid fa-clock"></i></div>
+                    <div class="kpi-data">
+                        <h3>Số Chuyến Trễ</h3>
+                        <p class="kpi-value" id="kpi-total-delayed">0</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon purple"><i class="fa-solid fa-percent"></i></div>
+                    <div class="kpi-data">
+                        <h3>Tỷ Lệ Trễ</h3>
+                        <p class="kpi-value" id="kpi-delay-rate">0.0%</p>
+                    </div>
+                </div>
+                <div class="kpi-card card">
+                    <div class="kpi-icon yellow"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <div class="kpi-data">
+                        <h3>Độ Trễ TB (Phút)</h3>
+                        <p class="kpi-value" id="kpi-avg-delay">0.0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DETAILED TRACKING SECTION (Role-based: Hidden for guest, visible for tracker) -->
+            <section class="card detailed-tracker-section hidden" id="detailed-tracker-section">
+                <div class="detailed-header">
+                    <i class="fa-solid fa-shield-halved text-purple"></i>
+                    <h2>Bảng Giám sát Chi tiết (Chỉ dành cho Flight Tracker)</h2>
+                    <span class="lock-tag"><i class="fa-solid fa-lock-open"></i> Đã mở khóa bảo mật (Column-Level Decrypted)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ngày Bay</th>
+                                <th>Hãng Hàng Không</th>
+                                <th>Số Hiệu (Flight)</th>
+                                <th>Sân Bay Nguồn</th>
+                                <th>Sân Bay Đích</th>
+                                <th>Đuôi Tàu Bay (Hashed Tail Num)</th>
+                                <th>Độ trễ đi (Phút)</th>
+                                <th>Độ trễ đến (Phút)</th>
+                                <th>Cao Độ (Elev FT)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailed-table-body">
+                            <!-- JS tự động chèn dòng dữ liệu -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- CHARTS GRID -->
+            <section class="charts-grid">
+                <!-- Monthly Trend Chart -->
+                <div class="chart-container card double-width">
+                    <div class="chart-header">
+                        <i class="fa-solid fa-chart-area"></i>
+                        <h3>Xu hướng bay và trễ chuyến theo thời gian</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Delay Breakdown Pie Chart -->
+                <div class="chart-container card">
+                    <div class="chart-header">
+                        <i class="fa-solid fa-circle-chart"></i>
+                        <h3>Phân bổ nguyên nhân gây trễ chuyến (Phút)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="breakdownChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Weather Impact Chart -->
+                <div class="chart-container card double-width">
+                    <div class="chart-header">
+                        <i class="fa-solid fa-cloud-showers-heavy"></i>
+                        <h3>Ảnh hưởng của Lượng mưa/Tuyết rơi đến Tỷ lệ trễ cất cánh (%)</h3>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="weatherChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Project Architecture Info -->
+                <div class="chart-container card" id="about">
+                    <div class="chart-header">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <h3>Kiến trúc Data Warehouse (GCP)</h3>
+                    </div>
+                    <div class="about-body">
+                        <p>Hệ thống tự động hóa nạp dữ liệu thô (Bronze Zone) lên <strong>Google Cloud Storage</strong>, sử dụng <strong>Google BigQuery</strong> để làm sạch và chuyển đổi (ELT) sang mô hình <strong>Star Schema</strong>.</p>
+                        <ul class="about-list">
+                            <li><i class="fa-solid fa-check text-green"></i> <strong>dim_airport</strong>: Hợp nhất OurAirports & OpenFlights</li>
+                            <li><i class="fa-solid fa-check text-green"></i> <strong>dim_weather</strong>: Tải qua Open-Meteo API</li>
+                            <li><i class="fa-solid fa-check text-green"></i> <strong>dim_date</strong>: Tích hợp lịch ngày lễ US Federal</li>
+                            <li><i class="fa-solid fa-shield-halved text-purple"></i> <strong>Security</strong>: Hóa đuôi tàu bay (Tail Number) qua SHA256</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- LOGIN MODAL (Glassmorphism design) -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-modal-card card">
+            <div class="modal-header">
+                <h2>Đăng Nhập Phân Quyền</h2>
+                <button class="close-btn" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Đăng nhập tài khoản hệ thống để truy xuất cột dữ liệu nhạy cảm của chuyến bay.</p>
+                <div class="input-group">
+                    <label for="username-input"><i class="fa-solid fa-user"></i> Tài khoản</label>
+                    <input type="text" id="username-input" placeholder="Nhập: tracker">
+                </div>
+                <div class="input-group">
+                    <label for="password-input"><i class="fa-solid fa-key"></i> Mật khẩu</label>
+                    <input type="password" id="password-input" placeholder="Nhập: aeroflow2024">
+                </div>
+                <div class="error-msg" id="login-error-msg">Tài khoản hoặc mật khẩu không hợp lệ!</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-login-btn">Đóng</button>
+                <button class="btn btn-primary" id="submit-login-btn">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Dashboard Logic -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

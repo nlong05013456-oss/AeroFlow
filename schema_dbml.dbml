@@ -1,0 +1,149 @@
+// ============================================================
+// AEROFLOW - LOGICAL DATA MODEL (dbdiagram.io / DBML)
+// Chuyển đổi từ ERD khái niệm ERDPlus sang Mô hình dữ liệu Logic 3NF
+// ============================================================
+
+Table AIRPORT {
+  airport_id varchar(10) [pk]
+  airport_name varchar(150)
+  city varchar(100)
+  state varchar(100)
+  latitude decimal
+  longitude decimal
+  elevation_ft int
+  timezone_offset int
+}
+
+Table RUNWAY {
+  runway_id varchar(10) [pk]
+  airport_id varchar(10) [ref: > AIRPORT.airport_id]
+  length_ft int
+  width_ft int
+  surface_type varchar(50)
+  lighted boolean
+}
+
+Table ROUTE {
+  route_id varchar(15) [pk]
+  origin_airport_id varchar(10) [ref: > AIRPORT.airport_id]
+  dest_airport_id varchar(10) [ref: > AIRPORT.airport_id]
+  distance_miles decimal
+  avg_flight_time_min int
+}
+
+Table CARRIER {
+  carrier_id varchar(10) [pk]
+  carrier_name varchar(150)
+}
+
+Table AIRCRAFT {
+  aircraft_id varchar(20) [pk]
+  carrier_id varchar(10) [ref: > CARRIER.carrier_id]
+  manufacturer varchar(100)
+  model varchar(100)
+  aircraft_type varchar(50)
+  capacity int
+  manufacture_year int
+}
+
+Table DATE {
+  date_id date [pk]
+  year int
+  quarter int
+  month int
+  day int
+  day_of_week varchar(20)
+  is_weekend boolean
+  is_holiday boolean
+  holiday_name varchar(100)
+}
+
+Table CANCELLATION_REASON {
+  cancellation_code varchar(5) [pk]
+  cancellation_desc varchar(150)
+}
+
+Table WEATHER {
+  weather_id varchar(30) [pk]
+  airport_id varchar(10) [ref: > AIRPORT.airport_id]
+  date_id date [ref: > DATE.date_id]
+  temp_max_c decimal
+  temp_min_c decimal
+  precipitation_mm decimal
+  snowfall_cm decimal
+  wind_speed_kmh decimal
+  weather_condition varchar(50)
+}
+
+Table FLIGHT {
+  flight_id varchar(50) [pk]
+  carrier_id varchar(10) [ref: > CARRIER.carrier_id]
+  aircraft_id varchar(20) [ref: > AIRCRAFT.aircraft_id]
+  route_id varchar(15) [ref: > ROUTE.route_id]
+  date_id date [ref: > DATE.date_id]
+  origin_weather_id varchar(30) [ref: > WEATHER.weather_id]
+  dest_weather_id varchar(30) [ref: > WEATHER.weather_id]
+  cancellation_code varchar(5) [ref: > CANCELLATION_REASON.cancellation_code]
+  flight_number varchar(10)
+  tail_number varchar(20)
+  dep_delay_min int
+  arr_delay_min int
+  cancelled boolean
+  diverted boolean
+  taxi_out_min int
+  taxi_in_min int
+  air_time_min int
+  carrier_delay_min int
+  weather_delay_min int
+  nas_delay_min int
+  security_delay_min int
+  late_aircraft_delay_min int
+}
+
+Table PASSENGER {
+  passenger_id varchar(20) [pk]
+  full_name varchar(150)
+  gender varchar(10)
+  nationality varchar(100)
+  date_of_birth date
+  loyalty_tier varchar(50)
+}
+
+Table TICKET {
+  ticket_id varchar(20) [pk]
+  passenger_id varchar(20) [ref: > PASSENGER.passenger_id]
+  fare_class varchar(20)
+  ticket_price_usd decimal
+}
+
+Table MANIFEST {
+  flight_id varchar(50) [ref: > FLIGHT.flight_id]
+  passenger_id varchar(20) [ref: > PASSENGER.passenger_id]
+  ticket_id varchar(20) [ref: > TICKET.ticket_id]
+  checkin_time datetime
+  baggage_weight_kg decimal
+
+  indexes {
+    (flight_id, passenger_id) [pk]
+  }
+}
+
+Table CREW {
+  crew_id varchar(20) [pk]
+  carrier_id varchar(10) [ref: > CARRIER.carrier_id]
+  full_name varchar(150)
+  role varchar(50)
+  license_number varchar(50)
+  license_type varchar(50)
+}
+
+Table CREW_ASSIGNMENT {
+  flight_id varchar(50) [ref: > FLIGHT.flight_id]
+  crew_id varchar(20) [ref: > CREW.crew_id]
+  duty_hours decimal
+  performance_rating decimal
+
+  indexes {
+    (flight_id, crew_id) [pk]
+  }
+}

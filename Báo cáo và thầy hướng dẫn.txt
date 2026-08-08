@@ -1,0 +1,98 @@
+# Meeting Transcription
+
+  Meeting started: 7/9/2026, 8:10:16 AM
+  Duration: 36 minutes
+  Participants: Long Nhật, Thương Mại Điện Tử Khoa, Thúy Diệu
+
+  [View original transcript](https://app.tactiq.io/api/2/u/m/r/mOym0eRAx9pHp4S6yPIH?o=txt)
+
+    
+
+  
+
+  
+
+  ## Transcript
+
+  00:00 Thương Mại Điện Tử Khoa: Sẽ phải nộp cái báo cáo cũng như là cái trình bày về cái cái điểm 2 của mình. Mục đích của cái cái đèn 2 này, tôi sẽ làm về coi Dữ liệu chỉ có bài toán dữ liệu thì bây giờ đầu tiên thì các nhóm có vấn đề gì trong cái việc thực hiện đề tài.
+00:44 Long Nhật: Vào đêm em là nhóm số 1 này thì nhóm em thấy hiện tại thì chưa Có vấn đề gì hết Tại vì tụi em đang làm từ phần bọn em đang làm cái đề tài theo hàng không ngành hàng không nên là bọn em sẽ do cái dữ liệu khá là lớn 7 triệu dòng nên tụi em sẽ dùng ilt thay vì etl này thì nó có vấn đề gì không?
+01:08 Thúy Diệu: Hi, I'm transcribing this call with my Tactiq AI Extension. https://tactiq.io/r/transcribing
+01:11 Thương Mại Điện Tử Khoa: Không bình thường không mình xử lý cái vấn đề không?
+01:17 Long Nhật: Thì tụi em tính là do cái file 7 triệu đồng đó thì tụi em sẽ có do về dự dưới local máy xong rồi em sẽ đẩy lên trên đẩy lên trên cloud này khá là nặng nên tụi em kiểu, Nếu mà tụi em
+01:32 Thương Mại Điện Tử Khoa: Vì sao không xử lý trực tiếp à?
+01:38 Long Nhật: down từ nếu mà rồi em dùng cloud 100% thì nó khá là nặng.
+01:47 Thương Mại Điện Tử Khoa: Thì mình chỉ Lót cái cái edit thôi chứ còn lại thì khi mà xử lý thì nó mình đâu cần phải lót lại toàn bộ đâu, Tại vì có
+01:57 Long Nhật: Thì em cũng nghĩ thế Nhưng mà nó.
+01:59 Thương Mại Điện Tử Khoa: vấn đề ở đây thì nếu như mà mà mình mà làm mà lót xuống dưới mấy lô cồ rồi rất là có hiệu quả gì trong cái việc mà mình áp dụng thực tế đâu.
+02:11 Long Nhật: Cái dữ liệu xong rồi chuẩn hóa xong rồi, bọn em chạy phân phân bậc cho dữ liệu nữa, người định là giống kiểu nếu là nếu tụi em sẽ làm là một kỹ sư dược liệu thì tụi em sẽ coi là nếu cái dự nào nào cần bảo mật thì tụi em sẽ bảo mật dữ liệu đó với cả thì em sẽ phân cấp bậc là nếu nếu mà trong
+02:34 Thương Mại Điện Tử Khoa: Gần.
+02:34 Long Nhật: một cái công ty thì ai sẽ được xem cái dữ liệu kia dữ liệu bảo mật hoặc là dữ liệu này là dữ liệu mục đích với bảo mật lại Định dạng lại cái dữ liệu đó.
+02:47 Thương Mại Điện Tử Khoa: Hóa
+03:18 Thương Mại Điện Tử Khoa: Có thấy có có boot một cái notion lên mà chẳng thấy bạn nào nộp ở đâu quy trình để mình ta làm một cái dataque hoàn chỉnh
+03:24 Long Nhật: Em.
+03:29 Thương Mại Điện Tử Khoa: mà không thấy nhóm nào bốt cái cái linkotion lên thầy theo dõi tiến độ.
+03:37 Long Nhật: Bỏ lên cho em cũng cũng làm cái đó xong rồi quên mất.
+03:43 Thương Mại Điện Tử Khoa: Hôm nay là các bạn làm để mà chúng ta kiểm tra kiểm soát vé còn không nữa làm như thế nào.
+03:51 Long Nhật: Em có muốn hỏi là về cái này là mình báo cáo online hết hả Thầy Hay là mình sẽ báo cáo trực tiếp.
+03:58 Thương Mại Điện Tử Khoa: Thường thì báo cáo trực tiếp nó sẽ hiệu quả hơn yêu cầu chạy được các kiểu như thế nào. Chúng ta bắt đầu học kì 1 rồi đúng không? Như thế nào thì cái quan trọng nhất ở trong cái cái điện 2 của chúng ta là chúng ta phải thiết kế được cái kho dữ liệu.
+05:01 Long Nhật: Là cạnh kia.
+05:03 Thương Mại Điện Tử Khoa: Rồi Đổ luôn. Thiết kế cái bài toán của mình và nó dữ liệu của mình, Mình sẽ đổ vào bảng nào và như thế nào qua làm sao còn cái kho thì chắc chỉ là nơi mà chúng ta lưu trữ dữ liệu thôi. Bây giờ thằng nhóm 1 đi nhóm 1 bao nhiêu là báo cáo xong rồi nhưng mà chưa có đi đúng không?
+06:00 Long Nhật: Liệu sẽ đi như thế nào này?
+06:07 Thương Mại Điện Tử Khoa: Ta có thể có trong cái bài toán như thế nào đi sau này chúng ta xây dựng cái data.
+06:18 Long Nhật: Cái cái đó là làm cái bước trên phòng luôn này sẽ xác định
+06:22 Thương Mại Điện Tử Khoa: Bước đầu tiên luôn bước đầu tiên trước khi mà transform luôn đó tức là sau khi mà chúng ta có bài toán thì chúng ta phải
+06:26 Long Nhật: thì bọn em có thiết kế rồi.
+06:30 Thương Mại Điện Tử Khoa: thiết kế cái ID cho các bài toán đó là bao gồm bao nhiêu?
+06:40 Long Nhật: mối quan hệ giữa các
+06:41 Thương Mại Điện Tử Khoa: Đúng rồi, Mặc dù là chúng ta có bài toán, nhưng mà chúng ta phải hiểu được chúng ta phải cần những cái dữ liệu nào chúng ta để mà chúng ta transform và chúng ta edl. Vì khi mà chúng ta có cái ID rồi, chúng ta mới xây dựng được cái tâm mua đồ và chúng ta được loa lên trên cái khâu hiểu không xong rồi chúng ta mới làm atl vào trong cái dữ liệu do vào trong cái kho của mình rồi mà.
+07:39 Long Nhật: Cái này có này này.
+07:47 Thương Mại Điện Tử Khoa: Sau đó rồi chúng ta mới bắt đầu đi chọn nền tảng cloud nào cho nó phù hợp chứ Rồi xử lý nó như thế nào.
+07:54 Long Nhật: Đẹp.
+08:03 Thương Mại Điện Tử Khoa: Chưa có luôn chưa có nhóm nào có da đen.
+08:09 Thúy Diệu: Da nhọn không có. Giờ thì em nói sơ qua về cái đề tài là hôm trước là bạn như ý có nhắn tin với thầy thì đề xuất cái làm cái hình vi du lịch, nhưng mà Tuy nhiên thì các cái nguồn dữ liệu là tụi em không có thu thập được chỉ thu thập được 2 đua thôi, còn lại là các nguồn khác lại lấy vì ai phải tốn rất là nhiều chi phí thì nên là tụi em đây là tụi em quyết định là làm một cái đề tài là liên quan giữa chứng khoán là tụi em sẽ xây dựng dataway house để mà tích hợp đầu tiên là dữ liệu chứng khoán thứ hai nữa là dữ liệu vĩ mô trên cái Word bên api, cái thứ ba nữa là dữ liệu nội bộ của tụi em thu thập được là các cây dữ liệu trong công ty như là như là về đặc điểm như là tài sản hay là đòn bẩy tài chính và các đặc điểm của CEO thì tụi em xây dựng được một cái yad như sau thì cái bảng phép macrolly là lấy từ dữ liệu.
+09:27 Thúy Diệu: Của vô bên thứ hai nữa là bạn phép của stop.
+09:34 Thương Mại Điện Tử Khoa: Đầu tiên là khi mà mình xây dựng ID á là mình phải biết mình sẽ có những cái đối tượng nào mình sẽ cần quản lý dữ liệu ví dụ như là về hồ sơ tài chính của công ty rồi về đặc điểm của công ty rồi các dự án Tức là mình phải phân ra các đối tượng mà mình sẽ quản lý rồi mình mới xây dựng cái đi Rồi có mối quan hệ của nó như thế nào rồi mới xác định nguồn dữ liệu hiểu không Tức là khi mà chúng ta xây dựng kho là chúng ta sẽ xây dựng một cái bài toán tổng quát về dữ liệu chứ không phải là chúng ta đi đi làm cho những dữ liệu mình có Và đây là cái điểm phức tạp của cái việc mà xây dựng kho hiểu không, Nó giống như là một cái cái nơi mà sau này là mấy cái ông mà phân tích dữ liệu thì mình sẽ phát dữ liệu cho ông ta Trên đây là có việc mà thiết kế cái bài về việc kho dữ liệu thì cái thiết kế cái các đối tượng cũng như là cái cái ID nó rất là quan trọng vì nếu mà sau này các bạn thích.
+10:34 Thương Mại Điện Tử Khoa: Mà không có bị thiếu á, người ta sẽ không làm phân tích được, chúng ta sẽ không có chiết xuất được chúng ta làm bạn hiểu không? Trên đây là thi mà mình làm thì mình sẽ bắt đầu từ bài toán
+10:48 Thúy Diệu: Dạ.
+10:50 Thương Mại Điện Tử Khoa: trước là mình sẽ cần quản lý những cái đối tượng nào ở trong bài toán của mình có mối quan hệ nó như thế nào qua làm sao và đối với lại những cái dữ liệu mà mình thu thập hiện có của mình là các ai dữ liệu hay là dữ liệu chúng ta sẽ có những nguồn dữ liệu nào chúng ta còn thiếu những cái dữ liệu nào Ví dụ như vậy? Được chưa Cho nên là cách tiếp cận của em là nó bị sai mình sẽ phải đầu ban đầu là mình phải thiết kế qua, nếu mà chúng ta làm một cái bài toán dữ liệu về chứng khoán thì chúng ta sẽ có bao nhiêu cái đối tượng chúng ta sẽ cần phải quản lý ở trong cái bài toán về chứng khoán này, ví dụ như bạn xây dựng một kho dữ liệu cho một công ty chứng khoán đi thì bây giờ thì bạn bạn sẽ sẽ quản lý những công ty chứng khoán nó sẽ cần quản lý những cái dữ liệu nào dữ liệu giao dịch thì tất nhiên ta phải có đúng không thì thông thường, cái dữ liệu cứ đặc thù của dữ liệu bạn biết là nó sẽ chia ra hai loại đúng không ạ, Còn một số những cái dữ liệu ví dụ như là về hồ sơ công ty các kiểu là nó ít thay đổi ví dụ như các bạn trong trường đại học.
+12:11 Thương Mại Điện Tử Khoa: ok, chưa Cho nên
+12:41 Thúy Diệu: Dạ em cảm ơn thầy.
+13:01 Thúy Diệu: Dạ có.
+13:48 Thúy Diệu: Dạ dữ liệu của tụi em là dữ liệu tất cả các công ty niêm yết trên sàn h ose.
+14:01 Thương Mại Điện Tử Khoa: Là bạn không làm trọng tâm 11 công ty cho nên các bài toán của bạn.
+14:45 Thương Mại Điện Tử Khoa: Chứ còn các bạn.
+15:16 Thương Mại Điện Tử Khoa: Bây giờ là chúng ta bắt đầu là chúng ta sẽ có cái bài toán này. Đã nắm rõ vấn đề để chúng ta làm rồi đầu tiên là chúng ta sẽ có cái bài toán của mình đúng không? Ạ bài toán mà chúng ta có thể là từ một cái vấn đề hay là từ một cái doanh nghiệp cụ thể nào đó rồi sau khi có bài toán.
+15:51 Thương Mại Điện Tử Khoa: Chúng ta phải tổ chức dữ liệu cho các bài toán đó thì tổ chức dữ liệu nó như thế nào ở đây là liên quan đến bao gồm được khi mà chúng ta đã xây dựng xong cái gì?
+16:26 Thương Mại Điện Tử Khoa: Thì chúng ta sẽ chuyển nó thành một cái gọi là data Model gọi là data streamer, các kiểu đó được chưa có phát, chúng ta sẽ chia ra cái loại dữ liệu nào điểm phát ở đây. Nhiều thay đổi ok chưa Sau khi mà chúng ta kết thúc chúng ta có cái đồ là chúng ta mới được chưa sao rồi, chúng ta mới đi tìm các nguồn dữ liệu đã có sọt từ Crow hay là cái gì đó, ví dụ như vậy hay là từ cắt gỗ hay là cái gì đó, Tức là nói chung là nhiều từ những cái nguồn dữ liệu mở Ok chưa?
+17:42 Thương Mại Điện Tử Khoa: Bài toán về tổ chức dữ liệu của mình hay là không biết là chúng ta sẽ cần tổ chức những cái dữ liệu gì hiểu không ạ? Được chưa? Là những tờ giá và đây đánh giá đều tất cả mọi thứ đúng theo nữa cũng có rồi cũng có rồi rất là nhiều thì khi mà các bạn đi làm thực tế bạn đi làm thực tế bao gồm cả các chi phí dữ liệu thôi dữ liệu là chọn.
+18:59 Thương Mại Điện Tử Khoa: Như thế nào?
+19:28 Thương Mại Điện Tử Khoa: Đừng có pha mà tôi gửi cho các bạn đầu kỳ nó có nền tảng.
+19:36 Long Nhật: Hỗ trợ Ông vừa thấy có người rồi.
+19:45 Thương Mại Điện Tử Khoa: Bạn có thể hiểu không bao gồm cả bài toán về trực quan xử
+20:23 Thương Mại Điện Tử Khoa: lý dữ liệu sau này nếu anh ta có Bill ứng dụng hay là hệ thống quản trị bài toán của doanh nghiệp Google thì không thể nào
+21:10 Thương Mại Điện Tử Khoa: chúng ta sử dụng thì đó là một cái vấn đề sau khi chúng ta chọn tào lao thì chúng ta mới bắt đầu làm công tác atl. Ant
+22:06 Thương Mại Điện Tử Khoa: Được gì hết ok chưa? vấn đề của tài liệu của thầy đã cung cấp cho các bạn thôi, Bạn đọc cho kỹ các kiểu được chưa, Nếu mà dữ liệu lớn thì nó sẽ như thế nào dữ liệu bao gồm cả hình ảnh cả sensor tất cả mọi thứ thì chúng ta sẽ tổ chức nó như thế nào nó sẽ phức tạp hơn rất là nhiều được chưa xong rồi chúng ta phải thiết kế cơ chế của cái ATM nữa khi nào để mà có vấn đề về dữ liệu thì chúng ta có Đúng không nó sẽ liên quan đến cái phần ốp này nè.
+23:17 Thương Mại Điện Tử Khoa: Ok, chưa gọi là cái chính sách về về cái cái vận hành off tức là viết tắt của chữ opec coi như là sau đó thì chúng ta mới bắt đầu chúng ta thiết kế thử demo một cái gì đó. Phân tích giống như các bạn làm ở địa ám hột á, Các bạn muốn phân tích cái gì thì chúng ta tiếp xúc với data airplay liên quan như vậy cấp II cái bước như vậy thôi mà làm tới 7 bước ra, chỉ có một nhóm mà giờ ok nhặt lông cũng vậy Cái nhóm số
+24:31 Thương Mại Điện Tử Khoa: 1 cũng vậy Mô tả lại cho kỹ cái bài Toán thiết kế cái cái xong rồi. Mình đi thứ Năm rồi thôi, Thứ hai tuần sau Ok chưa?
+25:06 Long Nhật: Rồi.
+25:19 Thương Mại Điện Tử Khoa: Một cái nền tảng là free hay là cái gì đó ok chưa nào có thắc mắc gì nữa không?
+25:49 Long Nhật: Nếu mà mình thiết kế cái rd sau rồi nếu mà mình kiếm được nếu mà đóng một số bạn phải tìm không thấy dữ liệu thì làm sao được.
+25:59 Thương Mại Điện Tử Khoa: Thì mình cứ ghi là tình trạng hiện tại dữ liệu của hắn là Missing hay như thế nào đó, ví dụ như vậy hoặc là mình kiếm một số những cái đề dữ liệu mẫu demo mà ipa, chúng ta có thể lấy được mà chúng ta không trả phí nhưng mà như thế nào.
+26:37 Thương Mại Điện Tử Khoa: Cho nên là là chúng ta chỉ cần một vài cái dữ liệu ancol là được Ok chưa? Đúng rồi thì mình cứ ghi vào thì sau này thì người ta biết không Ví dụ như vậy. Thì bây giờ.
+27:27 Long Nhật: Rồi đây.
+27:33 Thương Mại Điện Tử Khoa: Làm xong cho xong cái phần số 1 và số 2 cố gắng xong trong cái khoảng cuối tuần.
+28:06 Thương Mại Điện Tử Khoa: Mặc dù là chúng ta chỉ đang làm một cái bài một cái đề án mà mô phỏng thực tế, nhưng mà nó vẫn phải có một kinh nghiệm gì đó để chúng ta làm để coi hơn cho nó đúng như thế nào Ok chưa nhóm nào mà làm xong được làm tiếp phần đó ta sọt hay là cloud thì chúng ta có thể làm luôn ok chưa các kiểu thậm chí là có cái dữ liệu mẫu dữ liệu demo hay là các cái trường dữ liệu cần thiết là cái gì, Ví dụ như vậy ok chưa chắc chắn một điều rằng Hỗ trợ đầy đủ 100% bây giờ cho dù có dữ liệu mà nó nó có đầy đủ như thế nào nó cũng bị thiếu.
+29:07 Thương Mại Điện Tử Khoa: Không Ví dụ như dữ liệu của họ hiểu đó hiểu không?
+29:35 Thương Mại Điện Tử Khoa: Ok, chưa Ok chưa?
+30:24 Thương Mại Điện Tử Khoa: Làm số 1 số 2 dựng cái copy này ra ok chưa bây giờ ốm dự án thành viên bài toán nguồn dữ liệu phạm vi rồi Ok chưa.
+30:54 Thương Mại Điện Tử Khoa: Có câu hỏi thì tao nghỉ giao thông sẽ thay đổi như thế nào đầu tiên không phải đầu tiên là bạn xây dựng bài toán giao thông Trung Trung luôn.
+31:51 Thương Mại Điện Tử Khoa: Phương tiện công cộng rồi Mức độ di chuyển trông rất là
+32:24 Thương Mại Điện Tử Khoa: nhiều thứ trong đó quá lớn giao thông.
+33:10 Thương Mại Điện Tử Khoa: mình sẽ biết rằng là mình sẽ phải quản lý những cái thứ gì đúng không có mật độ dân số rồi các kiểu
+33:49 Thương Mại Điện Tử Khoa: Bị tai nạn đây là quản lý nữa.
+34:18 Thương Mại Điện Tử Khoa: Thông thường mấy thực thể ở trong cái giờ thông thường đa số ở trong cái đi, nó sẽ là đi hết nhưng mà có một vài hiểu không?
+35:07 Thương Mại Điện Tử Khoa: Sản phẩm dữ liệu về khách hàng dữ liệu về kho dữ liệu về chi nhánh dữ liệu về cửa hàng, Ví dụ như vậy ok chưa Như thế nào đi phát ra là sao data.
+36:07 Thương Mại Điện Tử Khoa: Ok, chưa tháng đầu đúng không?
+36:36 Thương Mại Điện Tử Khoa: Ai làm ít được những phần tiếp theo thì cứ làm.
+36:38 Long Nhật: Zalo.
+  
