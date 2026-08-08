@@ -4,7 +4,9 @@
 
 > ⚙️ **Data Engineering** · 📊 **Data Analytics** · ☁️ **Cloud** · 🌐 **Web Application**
 
-AeroFlow is an end-to-end aviation data platform built on **Google Cloud Platform (GCP)** to collect, process, store, validate, and analyze flight and weather data.
+AeroFlow is an end-to-end aviation data platform built on **Google Cloud Platform (GCP)** for ingesting, processing, storing, validating, and analyzing flight and weather data.
+
+The platform connects **business requirements → data engineering → analytics → business insights** through a centralized cloud data architecture.
 
 ---
 
@@ -13,11 +15,21 @@ AeroFlow is an end-to-end aviation data platform built on **Google Cloud Platfor
 ```text
 Business Requirements
         ↓
-Data Sources → Data Ingestion → Data Lake
+Data Sources
         ↓
-ELT Pipeline → Data Warehouse → Data Quality
+Data Ingestion
         ↓
-Data Analytics → Business Insights
+Data Lake
+        ↓
+ELT Pipeline
+        ↓
+Data Warehouse
+        ↓
+Data Quality
+        ↓
+Data Analytics
+        ↓
+Business Insights
         ↓
 Web Application
 ```
@@ -26,66 +38,92 @@ Web Application
 
 ## ⚙️ Data Engineering
 
-- Multi-source flight, weather, airport & airline data ingestion
-- Modular ETL / ELT pipeline
-- Google Cloud Storage Data Lake
-- BigQuery Data Warehouse
-- Star Schema & dimensional modeling
-- Partitioning & Clustering
-- Data Quality validation
-- Pipeline monitoring
+AeroFlow is designed as a modular and scalable data pipeline.
+
+* Multi-source flight, weather, airport, and airline data ingestion
+* Modular ETL / ELT pipeline
+* Cloud-based Data Lake with Google Cloud Storage
+* BigQuery Data Warehouse
+* Star Schema & dimensional modeling
+* Table partitioning & clustering
+* Automated data quality validation
+* Pipeline execution & monitoring
 
 ---
 
 ## 🏢 Data Warehouse
 
-Built with **BigQuery** using a Star Schema centered around flight events.
+The analytical layer is built on **BigQuery** using a **Star Schema** centered around flight events.
 
 ```text
-             dim_date
-                │
-                ↓
-dim_airport → fact_flights ← dim_carrier
-                │
-          ┌─────┴─────┐
-          ↓           ↓
-    dim_weather  dim_aircraft
+                    dim_date
+                       │
+                       ↓
+dim_airport ─────→ fact_flights ←───── dim_carrier
+                       │
+                 ┌─────┴─────┐
+                 ↓           ↓
+           dim_weather   dim_aircraft
 ```
 
-**Fact:** `fact_flights`
+### Fact Table
 
-**Dimensions:** `date` · `airport` · `carrier` · `aircraft` · `weather`
+`fact_flights`
+
+Contains flight-level events and operational metrics such as delays, cancellations, distance, and other flight performance indicators.
+
+### Dimension Tables
+
+`dim_date` · `dim_airport` · `dim_carrier` · `dim_aircraft` · `dim_weather`
+
+This dimensional model supports analytical queries, KPI reporting, and dashboard applications.
 
 ---
 
 ## 📊 Data Analytics
 
-Transforming warehouse data into aviation KPIs and business insights.
+AeroFlow transforms warehouse data into aviation KPIs and actionable business insights.
 
-- ✈️ Flight volume & trends
-- ⏱️ Delay & cancellation analysis
-- 🏢 Airline performance
-- 🛫 Airport performance
-- 🌦️ Weather impact
-- 📈 On-time performance
+* ✈️ Flight volume & operational trends
+* ⏱️ Delay & cancellation analysis
+* 🏢 Airline performance
+* 🛫 Airport performance
+* 🌦️ Weather impact analysis
+* 📈 On-time performance
 
 ```text
-BigQuery → SQL → KPI → Visualization → Insights
+BigQuery
+    ↓
+SQL Analytics
+    ↓
+KPI Calculation
+    ↓
+Visualization
+    ↓
+Business Insights
 ```
 
 ---
 
 ## 🌐 Web Application
 
-A web dashboard built on top of the data platform.
+AeroFlow provides a web application built on top of the data platform, connecting operational data with end-user analytics.
 
-**Customer Portal**
+### 👤 Customer Portal
 
-Flight Search · Flight Details · Airport / Airline Information · Weather · Flight Risk
+* Flight Search
+* Flight Details
+* Airport & Airline Information
+* Weather Information
+* Flight Risk
 
-**Admin Dashboard**
+### 🛠️ Admin Dashboard
 
-KPI Monitoring · Flight Analytics · Delay Analysis · Data Quality · Pipeline Monitoring
+* KPI Monitoring
+* Flight Analytics
+* Delay Analysis
+* Data Quality Monitoring
+* Pipeline Monitoring
 
 🚀 **[Live Demo](https://aeroflow-orchestrator-980661018616.us-central1.run.app/)**
 
@@ -93,19 +131,24 @@ KPI Monitoring · Flight Analytics · Delay Analysis · Data Quality · Pipeline
 
 ## 🛠️ Tech Stack
 
-**⚙️ Data Engineering**  
-`Python` `SQL` `ETL / ELT` `BigQuery` `GCS` `Apache Beam`
+### ⚙️ Data Engineering
 
-**📊 Data Analytics**  
+`Python` `SQL` `ETL / ELT` `BigQuery` `Google Cloud Storage` `Apache Beam`
+
+### 📊 Data Analytics
+
 `Pandas` `SQL` `KPI Analysis` `Data Visualization` `Business Intelligence`
 
-**☁️ Cloud**  
-`GCP` `Cloud Run`
+### ☁️ Cloud
 
-**🌐 Web**  
+`Google Cloud Platform` `Cloud Run`
+
+### 🌐 Web Application
+
 `Flask` `REST API` `HTML` `CSS` `JavaScript` `Chart.js`
 
-**🔗 Data Sources**  
+### 🔗 Data Sources
+
 `Open-Meteo` `OpenFlights` `OurAirports` `Flight Data`
 
 ---
@@ -117,12 +160,14 @@ AeroFlow/
 ├── main.py
 ├── requirements.txt
 ├── Dockerfile
+│
 ├── src/
 │   ├── extract.py
 │   ├── transform.py
 │   ├── load.py
 │   ├── quality.py
 │   └── orchestrator.py
+│
 ├── web/
 ├── sql/
 ├── docs/
@@ -130,41 +175,82 @@ AeroFlow/
 └── notebooks/
 ```
 
+The repository is organized into separate layers for **data processing, web application, SQL, documentation, automation scripts, and exploratory analysis**.
+
 ---
 
 ## 🚀 Quick Start
 
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/nlong05013456-oss/AeroFlow.git
 cd AeroFlow
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+### 3. Run the pipeline
+
+```bash
 python main.py
 ```
 
-Run the dashboard:
+### 4. Run the web application
 
 ```bash
 python web/app.py
 ```
 
-Open `http://localhost:5000`
+Then open:
 
-> ⚠️ Configure GCP credentials before running the pipeline. Never commit credentials, API keys, or `.env` files.
+```text
+http://localhost:5000
+```
+
+> ⚠️ **Configuration:** GCP credentials and required environment variables must be configured before running cloud-based components. Never commit credentials, API keys, or `.env` files to the repository.
 
 ---
 
 ## 🎯 Project Focus
 
-**⚙️ Data Engineering — Core**  
-Data Ingestion · ELT · Data Lake · Data Warehouse · Data Quality · Cloud
+### ⚙️ Data Engineering — Core
 
-**📊 Data Analytics — Core**  
-SQL · KPI Analysis · Visualization · Business Intelligence · Business Insights
+**Data Ingestion** · **ELT Pipeline** · **Data Lake** · **Data Warehouse** · **Data Quality** · **Cloud Data Platform**
 
-**☁️ Cloud & 🌐 Web — Supporting**  
-GCP · Flask API · Analytics Dashboard
+### 📊 Data Analytics — Core
+
+**SQL** · **KPI Analysis** · **Visualization** · **Business Intelligence** · **Business Insights**
+
+### ☁️ Cloud & 🌐 Web — Supporting
+
+**GCP** · **Cloud Run** · **Flask API** · **Analytics Dashboard**
 
 ---
+
+## 🔄 End-to-End Architecture
+
+```text
+Business
+   ↓
+Data Sources
+   ↓
+Data Engineering
+   ↓
+Cloud Data Platform
+   ↓
+Data Warehouse
+   ↓
+Analytics
+   ↓
+Business Insights
+   ↓
+Web Application
+```
 
 ### `Business → Data → Engineering → Analytics → Insights`
 
